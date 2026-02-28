@@ -473,68 +473,44 @@
                 container.appendChild(item);
             });
         }
-   function createHotspotElement(x, y, type, data) {
-    // إنشاء العنصر الرئيسي
+  function createHotspotElement(x, y, type, data) {
     const div = document.createElement('div');
     div.className = 'hotspot-marker';
-    div.style.left = x + 'px';
-    div.style.top = y + 'px';
-    div.style.position = 'absolute';
-    div.style.transform = 'translate(-50%, -50%)';
-    div.style.cursor = 'pointer';
-    div.style.zIndex = '1000';
-    div.style.pointerEvents = 'auto';
-    div.style.transition = 'all 0.2s ease';
+    div.style.cssText = `
+        left: ${x}px;
+        top: ${y}px;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        z-index: 1000;
+        pointer-events: auto;
+        transition: all 0.2s ease;
+    `;
     
-    // اختيار الأيقونة المناسبة
     const iconUrl = type === 'SCENE' ? 'icon/hotspot.png' : 'icon/info.png';
     const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
     const displayText = type === 'SCENE' 
         ? (data.targetSceneName || 'انتقال') 
         : (data.title || 'معلومات');
     
-    // إنشاء عنصر الصورة
-    const img = document.createElement('img');
-    img.src = iconUrl;
-    img.alt = type;
-    img.style.width = '40px';
-    img.style.height = '40px';
-    img.style.borderRadius = '50%';
-    img.style.border = '2px solid ' + borderColor;
-    img.style.background = 'rgba(0,0,0,0.3)';
-    img.style.cursor = 'pointer';
-    img.style.pointerEvents = 'none';
-    img.style.display = 'block';
-    
-    // إنشاء تسمية النقطة
-    const label = document.createElement('div');
-    label.className = 'hotspot-label';
-    label.style.position = 'absolute';
-    label.style.top = '-40px';
-    label.style.left = '50%';
-    label.style.transform = 'translateX(-50%)';
-    label.style.background = 'rgba(20, 30, 40, 0.95)';
-    label.style.color = 'white';
-    label.style.padding = '6px 12px';
-    label.style.borderRadius = '20px';
-    label.style.fontSize = '12px';
-    label.style.whiteSpace = 'nowrap';
-    label.style.border = '2px solid ' + borderColor;
-    label.style.opacity = '0';
-    label.style.transition = 'opacity 0.2s ease';
-    label.style.pointerEvents = 'none';
-    label.textContent = displayText;
-    
-    div.appendChild(img);
-    div.appendChild(label);
+    div.innerHTML = `
+        <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
+        <div style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:1001;">${displayText}</div>
+    `;
     
     // حدث النقر
-    div.addEventListener('click', function(e) {
+    div.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
         
+        console.log('🖱️ Clicked:', type, data);
+        
         if (type === 'INFO') {
-            showInfoWindow(data.title, data.content);
+            if (typeof showInfoWindow === 'function') {
+                showInfoWindow(data.title, data.content);
+            } else {
+                alert(`${data.title}\n\n${data.content}`);
+            }
         } else {
             const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
             if (targetIndex !== -1) {
@@ -543,7 +519,18 @@
             }
         }
         return false;
-    });
+    };
+    
+    // حدث hover
+    div.onmouseenter = function() {
+        this.querySelector('div').style.opacity = '1';
+    };
+    div.onmouseleave = function() {
+        this.querySelector('div').style.opacity = '0';
+    };
+    
+    return div;
+}
     
     // حدث hover
     div.addEventListener('mouseenter', function() {
