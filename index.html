@@ -131,14 +131,15 @@
             cursor: pointer !important;
             z-index: 10000 !important;
             pointer-events: auto !important;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease; /* تعديل هنا */
+            will-change: transform, left, top; /* تحسين الأداء */
         }
         .hotspot-marker img {
             width: 40px;
             height: 40px;
             filter: drop-shadow(0 0 10px currentColor);
             pointer-events: none !important;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease;
             border-radius: 50%;
             background: rgba(0,0,0,0.3);
             border: 2px solid;
@@ -290,9 +291,15 @@
         .hotspot-marker *:not(::after) {
             pointer-events: none;
         }
+        
+        /* إصلاح مشكلة التحريك عند النقر */
+        .hotspot-marker:active {
+            transform: translate(-50%, -50%) !important; /* منع التغيير عند النقر */
+        }
     </style>
 </head>
 <body>
+
   <div class="info">🏗️ tour-1772286978175</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
@@ -338,12 +345,13 @@
                     cursor: pointer;
                     z-index: 1000;
                     pointer-events: auto;
-                    transition: all 0.2s ease;
+                    transition: transform 0.2s ease, opacity 0.2s ease;
+                    will-change: transform, left, top;
                 `;
                 
                 div._fixedPosition = worldPos.clone();
                 div.dataset.id = id;
-                div.dataset.type = type; // تخزين النوع للاستخدام لاحقاً
+                div.dataset.type = type;
                 
                 const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
                 const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
@@ -369,7 +377,8 @@
                     } else {
                         const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
                         if (targetIndex !== -1) {
-                            this.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                            // ✅ إزالة تأثير التحريك عند النقر
+                            // this.style.transform = 'translate(-50%, -50%) scale(1.5)'; // تم التعطيل
                             setTimeout(() => loadScene(targetIndex), 300);
                         }
                     }
@@ -402,7 +411,8 @@
                     
                     const pos = icon._fixedPosition.clone().project(camera);
                     
-                    if (pos.z > 1) {
+                    // ✅ تخفيف شرط الإخفاء - إظهار المزيد من النقاط
+                    if (pos.z > 1.5) { // زيادة من 1 إلى 1.5
                         icon.style.display = 'none';
                         return;
                     }
@@ -431,12 +441,13 @@
                     const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
                     const projected = pos.clone().project(camera);
                     
-                    if (projected.z > 1) return;
+                    // ✅ تخفيف شرط الإخفاء
+                    if (projected.z > 1.5) return;
                     
                     const x = (projected.x * 0.5 + 0.5) * width;
                     const y = (-projected.y * 0.5 + 0.5) * height;
                     
-                    if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
+                    if (x < -200 || x > width + 200 || y < -200 || y > height + 200) return; // توسيع المنطقة
                     
                     this.create(x, y, h.type, h.data, h.id, pos);
                 });
@@ -628,16 +639,14 @@
                     HotspotManager.updatePositions();
                 });
                 
-                // متغير للتحكم بمعدل التحديث
                 let lastUpdate = 0;
-                const UPDATE_INTERVAL = 50; // تحديث كل 50ms (20 إطار/ثانية)
+                const UPDATE_INTERVAL = 50;
                 
                 function animate(time) {
                     requestAnimationFrame(animate);
                     controls.update();
                     renderer.render(scene3D, camera);
                     
-                    // تحديث المواقع بشكل أقل تكراراً لمنع الاهتزاز
                     if (time - lastUpdate > UPDATE_INTERVAL) {
                         HotspotManager.updatePositions();
                         lastUpdate = time;
