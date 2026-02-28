@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>tour-1772251953359 - جولة افتراضية</title>
+    <title>tour-1772255919331 - جولة افتراضية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -148,7 +148,7 @@
     </style>
 </head>
 <body>
-    <div class="info">🏗️ tour-1772251953359</div>
+    <div class="info">🏗️ tour-1772255919331</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
     
@@ -198,11 +198,9 @@
                 const item = document.createElement('div');
                 item.className = 'scene-item' + (index === currentSceneIndex ? ' active' : '');
                 const hotspotCount = scene.hotspots ? scene.hotspots.length : 0;
-                item.innerHTML = `
-                    <span class="scene-icon">${index === 0 ? '🏠' : '🏢'}</span>
-                    <span class="scene-name">${scene.name}</span>
-                    <span class="scene-hotspot-count">${hotspotCount}</span>
-                `;
+                item.innerHTML = '<span class="scene-icon">' + (index === 0 ? '🏠' : '🏢') + '</span>' +
+                    '<span class="scene-name">' + scene.name + '</span>' +
+                    '<span class="scene-hotspot-count">' + hotspotCount + '</span>';
                 item.addEventListener('click', () => loadScene(index));
                 container.appendChild(item);
             });
@@ -213,6 +211,8 @@
             div.className = 'hotspot-marker';
             div.style.left = x + 'px';
             div.style.top = y + 'px';
+            div.style.cursor = 'pointer';
+            div.style.zIndex = '1000';
             
             const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
             const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
@@ -220,25 +220,25 @@
                 ? (data.targetSceneName || 'انتقال') 
                 : (data.title || 'معلومات');
             
-            div.innerHTML = `
-                <img src="${iconUrl}" alt="${type}" style="border: 2px solid ${borderColor};">
-                <div class="hotspot-label" style="border-color: ${borderColor};">${displayText}</div>
-            `;
+            div.innerHTML = '<img src="' + iconUrl + '" alt="' + type + '" style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); cursor: pointer; pointer-events: none;">' +
+                '<div class="hotspot-label" style="border-color: ' + borderColor + ';">' + displayText + '</div>';
             
-            if (type === 'INFO') {
-                div.addEventListener('click', (e) => {
-                    e.stopPropagation();
+            div.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                if (type === 'INFO') {
                     showInfoWindow(data.title, data.content);
-                });
-            } else {
-                div.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                } else {
                     const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
                     if (targetIndex !== -1) {
-                        loadScene(targetIndex);
+                        this.style.transform = 'scale(1.5)';
+                        setTimeout(() => loadScene(targetIndex), 300);
                     }
-                });
-            }
+                }
+            });
+            
+            div.style.cursor = 'pointer';
             
             return div;
         }
@@ -248,14 +248,12 @@
             
             const win = document.createElement('div');
             win.className = 'custom-info-window';
-            win.innerHTML = `
-                <div class="window-header">
-                    <img src="${ICONS.info}">
-                    <h3>${title || 'معلومات'}</h3>
-                </div>
-                <div class="window-content">${content || ''}</div>
-                <button class="window-close">حسناً</button>
-            `;
+            win.innerHTML = '<div class="window-header">' +
+                '<img src="' + ICONS.info + '">' +
+                '<h3>' + (title || 'معلومات') + '</h3>' +
+                '</div>' +
+                '<div class="window-content">' + (content || '') + '</div>' +
+                '<button class="window-close">حسناً</button>';
             
             win.querySelector('.window-close').onclick = () => win.remove();
             document.body.appendChild(win);
@@ -268,7 +266,7 @@
             hotspotMarkers = {};
             
             const currentScene = scenes[currentSceneIndex];
-            if (!currentScene?.hotspots?.length) return;
+            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
             
             const width = window.innerWidth, height = window.innerHeight;
             
@@ -290,9 +288,9 @@
                 hotspotMarkers[h.id] = iconElement;
             });
         }
-
+        
         function togglePathsByType(type, visible) {
-            allPaths.forEach(p => { if (p.userData?.type === type) p.visible = visible; });
+            allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
         }
         
         function createPathsTogglePanel() {
@@ -302,10 +300,8 @@
             ['EL', 'AC', 'WP', 'WA', 'GS'].forEach(type => {
                 const div = document.createElement('div');
                 div.className = 'path-toggle-item';
-                div.innerHTML = `
-                    <input type="checkbox" id="toggle-${type}" checked data-type="${type}">
-                    <label for="toggle-${type}"><span class="path-color-dot" style="background:${pathColors[type]}"></span> ${type}</label>
-                `;
+                div.innerHTML = '<input type="checkbox" id="toggle-' + type + '" checked data-type="' + type + '">' +
+                    '<label for="toggle-' + type + '"><span class="path-color-dot" style="background:' + pathColors[type] + '"></span> ' + type + '</label>';
                 div.querySelector('input').addEventListener('change', e => togglePathsByType(type, e.target.checked));
                 toggleList.appendChild(div);
             });
@@ -322,7 +318,7 @@
             allPaths.forEach(p => scene3D.remove(p));
             allPaths = [];
             
-            new THREE.TextureLoader().load(sceneData.image, texture => {
+            new THREE.TextureLoader().load(sceneData.image, function(texture) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.x = -1;
@@ -398,7 +394,7 @@
                 controls.autoRotate = autoRotate;
                 controls.autoRotateSpeed = 0.5;
                 
-                document.getElementById('autoRotateBtn').onclick = () => {
+                document.getElementById('autoRotateBtn').onclick = function() {
                     autoRotate = !autoRotate;
                     controls.autoRotate = autoRotate;
                     document.getElementById('autoRotateBtn').textContent = 
@@ -409,7 +405,7 @@
                 initScenePanel();
                 loadScene(0);
                 
-                window.addEventListener('resize', () => {
+                window.addEventListener('resize', function() {
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize(window.innerWidth, window.innerHeight);
