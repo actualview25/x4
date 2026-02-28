@@ -26,7 +26,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
-        /* زر التدوير - بنفس التصميم */
+        /* زر التدوير */
         #autoRotateBtn {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             padding: 12px 24px;
@@ -47,7 +47,7 @@
             border-color: rgba(136, 170, 255, 0.8);
         }
         
-        /* قائمة المشاهد الجانبية - بنفس التصميم */
+        /* قائمة المشاهد الجانبية */
         .scene-list-panel {
             position: fixed; top: 50%; left: 20px; transform: translateY(-50%);
             width: 260px; max-height: 70vh;
@@ -103,7 +103,7 @@
         .scene-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .scene-hotspot-count { font-size: 11px; background: rgba(74, 108, 143, 0.4); padding: 2px 6px; border-radius: 12px; color: #88aaff; }
         
-        /* لوحة التحكم بالمسارات - بنفس التصميم */
+        /* لوحة التحكم بالمسارات */
         .paths-control-panel {
             position: fixed; top: 20px; right: 20px;
             background: rgba(20, 30, 40, 0.75);
@@ -124,24 +124,25 @@
         .path-toggle-item label { flex: 1; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .path-color-dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
         
-        /* نظام Hotspots - محسن */
+        /* نظام Hotspots - محسن بالكامل */
         .hotspot-marker {
             position: absolute;
             transform: translate(-50%, -50%);
             cursor: pointer !important;
-            z-index: 1000;
-            transition: all 0.2s ease;
+            z-index: 10000 !important;
             pointer-events: auto !important;
+            transition: all 0.2s ease;
         }
         .hotspot-marker img {
             width: 40px;
             height: 40px;
             filter: drop-shadow(0 0 10px currentColor);
-            pointer-events: none;
+            pointer-events: none !important;
             transition: all 0.2s ease;
             border-radius: 50%;
             background: rgba(0,0,0,0.3);
             border: 2px solid;
+            display: block !important;
         }
         .hotspot-marker:hover img {
             transform: scale(1.15);
@@ -149,7 +150,7 @@
         }
         
         .hotspot-label {
-            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
             background: rgba(20, 30, 40, 0.95);
             backdrop-filter: blur(5px);
             color: white;
@@ -162,13 +163,28 @@
             opacity: 0;
             transition: opacity 0.2s ease;
             pointer-events: none;
-            z-index: 1001;
+            z-index: 10001;
             font-weight: 500;
         }
 
-        .hotspot-marker:hover .hotspot-label { opacity: 1; }
+        .hotspot-marker:hover .hotspot-label { opacity: 1 !important; }
         
-        /* نافذة المعلومات المحسنة - بنفس التصميم */
+        /* توسيع منطقة النقر */
+        .hotspot-marker::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            z-index: -1;
+        }
+        
+        /* نافذة المعلومات */
         .custom-info-window {
             position: fixed;
             bottom: 30px;
@@ -180,13 +196,13 @@
             border-radius: 20px;
             padding: 20px 30px;
             color: white;
-            z-index: 10000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            z-index: 100000;
             max-width: 400px;
             width: 90%;
             animation: slideUp 0.3s ease;
             direction: rtl;
             pointer-events: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
         .custom-info-window .window-header {
             display: flex;
@@ -220,6 +236,11 @@
             to { transform: translate(-50%, 0); opacity: 1; }
         }
         
+        /* منع الحاوية من حجب النقرات */
+        #container, canvas {
+            pointer-events: none !important;
+        }
+
         @media (max-width: 768px) {
             .scene-list-panel { width: 200px; left: 10px; }
             .scene-list-panel.collapsed { width: 40px; }
@@ -230,226 +251,6 @@
             .hotspot-marker img { width: 35px; height: 35px; }
             #autoRotateBtn { font-size: 14px; padding: 10px 20px; }
         }
-        /* ===== تحسين النوافذ - Glassmorphism ===== */
-
-/* نافذة التحكم بالمسارات */
-.paths-control-panel {
-    background: rgba(20, 30, 40, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid rgba(74, 108, 143, 0.5) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* نافذة قائمة المشاهد */
-.scene-list-panel {
-    background: rgba(20, 30, 40, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid rgba(74, 108, 143, 0.5) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* رأس النوافذ */
-.panel-header {
-    background: rgba(30, 40, 50, 0.8) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border-bottom: 2px solid rgba(74, 108, 143, 0.5) !important;
-}
-
-/* نافذة المعلومات */
-.custom-info-window {
-    background: rgba(20, 30, 40, 0.85) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid #ffaa44 !important;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
-}
-
-/* زر الدوران */
-#autoRotateBtn {
-    background: rgba(20, 30, 40, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid rgba(74, 108, 143, 0.5) !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-}
-
-/* معلومات المشروع */
-.info {
-    background: rgba(20, 30, 40, 0.75) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 2px solid rgba(74, 108, 143, 0.5) !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-}
-/* تحسين الأيقونات والنقر */
-.hotspot-marker {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer !important;
-    z-index: 1000;
-    pointer-events: auto !important;
-    transition: all 0.2s ease;
-}
-
-.hotspot-marker img {
-    display: block !important;
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 50%;
-    pointer-events: none;
-    box-shadow: 0 0 15px currentColor;
-}
-
-.hotspot-marker:hover {
-    transform: translate(-50%, -50%) scale(1.1);
-    filter: drop-shadow(0 0 15px gold);
-    z-index: 1001;
-}
-
-.hotspot-marker:hover .hotspot-label {
-    opacity: 1 !important;
-}
-
-.hotspot-label {
-    position: absolute;
-    top: -45px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(20, 30, 40, 0.95);
-    backdrop-filter: blur(5px);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    white-space: nowrap;
-    border: 2px solid;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-    z-index: 1002;
-}
-
-/* للتأكد من أن النقر يعمل على كامل مساحة الأيقونة */
-.hotspot-marker::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-    z-index: -1;
-}
-    /* تحسين النقر على القائمة */
-.scene-item, .scene-item * {
-    cursor: pointer !important;
-    pointer-events: auto !important;
-}
-
-.scene-list-container {
-    pointer-events: auto !important;
-}
-
-.scene-list-panel {
-    pointer-events: auto !important;
-}
-
-    /* ===== نفس ألوان الأداة الأصلية ===== */
-
-/* نافذة التحكم بالمسارات */
-.paths-control-panel {
-    background: rgba(20, 30, 40, 0.25) !important;  /* ✅ نفس شفافية الأداة */
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(74, 108, 143, 0.3) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* نافذة قائمة المشاهد */
-.scene-list-panel {
-    background: rgba(20, 30, 40, 0.25) !important;  /* ✅ نفس شفافية الأداة */
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(74, 108, 143, 0.3) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* رأس النوافذ */
-.panel-header {
-    background: rgba(0, 0, 0, 0.2) !important;
-    border-bottom: 1px solid rgba(74, 108, 143, 0.2) !important;
-}
-
-/* نافذة المعلومات */
-.custom-info-window {
-    background: rgba(20, 30, 40, 0.3) !important;  /* ✅ أكثر شفافية */
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(74, 108, 143, 0.3) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* زر الدوران */
-#autoRotateBtn {
-    background: rgba(20, 30, 40, 0.25) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(74, 108, 143, 0.3) !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* معلومات المشروع */
-.info {
-    background: rgba(20, 30, 40, 0.25) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(74, 108, 143, 0.3) !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
-}    
-/* ===== حل مشكلة النقر على الأيقونات ===== */
-
-/* التأكد من أن الأيقونات تستقبل النقر */
-.hotspot-marker {
-    pointer-events: auto !important;
-    cursor: pointer !important;
-    z-index: 10000 !important;  /* طبقة عالية جداً */
-}
-
-/* الصورة لا تمنع النقر */
-.hotspot-marker img {
-    pointer-events: none !important;
-}
-
-/* التأكد من عدم وجود عناصر تحجب الأيقونات */
-#container {
-    pointer-events: none !important;  /* الحاوية لا تمنع النقر */
-}
-
-canvas {
-    pointer-events: none !important;  /* عنصر canvas لا يمنع النقر */
-}
-
-/* توسيع منطقة النقر */
-.hotspot-marker::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-    z-index: 9999;
-}
     </style>
 </head>
 <body>
@@ -481,9 +282,131 @@ canvas {
         let scenes = [];
         let scene3D, camera, renderer, controls, sphereMesh;
         let allPaths = [];
-        let hotspotMarkers = {};
         
         const pathColors = { EL: '#ffcc00', AC: '#00ccff', WP: '#0066cc', WA: '#ff3300', GS: '#33cc33' };
+        
+        // =======================================
+        // مدير Hotspots المتطور - ثابت + نقر
+        // =======================================
+        const HotspotManager = {
+            markers: {},
+            
+            create: function(x, y, type, data, id, worldPos) {
+                const div = document.createElement('div');
+                div.className = 'hotspot-marker';
+                div.style.cssText = `
+                    left: ${x}px;
+                    top: ${y}px;
+                    position: absolute;
+                    transform: translate(-50%, -50%);
+                    cursor: pointer;
+                    z-index: 10000;
+                    pointer-events: auto;
+                    transition: all 0.2s ease;
+                `;
+                
+                // تخزين الموقع الثابت و ID
+                div._fixedPosition = worldPos.clone();
+                div.dataset.id = id;
+                
+                const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
+                const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
+                const displayText = type === 'SCENE' 
+                    ? (data.targetSceneName || 'انتقال') 
+                    : (data.title || 'معلومات');
+                
+                div.innerHTML = `
+                    <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
+                    <div class="hotspot-label" style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none;">${displayText}</div>
+                `;
+                
+                // حدث النقر
+                div.onclick = function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    if (type === 'INFO') {
+                        if (typeof showInfoWindow === 'function') {
+                            showInfoWindow(data.title, data.content);
+                        } else {
+                            alert(data.title + '\n\n' + data.content);
+                        }
+                    } else {
+                        const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+                        if (targetIndex !== -1) {
+                            this.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                            setTimeout(() => loadScene(targetIndex), 300);
+                        }
+                    }
+                };
+                
+                // حدث hover
+                div.onmouseenter = function() {
+                    this.querySelector('.hotspot-label').style.opacity = '1';
+                };
+                div.onmouseleave = function() {
+                    this.querySelector('.hotspot-label').style.opacity = '0';
+                };
+                
+                document.body.appendChild(div);
+                this.markers[id] = div;
+                
+                return div;
+            },
+            
+            updatePositions: function() {
+                if (!camera) return;
+                
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                Object.values(this.markers).forEach(icon => {
+                    if (!icon._fixedPosition) return;
+                    
+                    const pos = icon._fixedPosition.clone().project(camera);
+                    
+                    if (pos.z > 1) {
+                        icon.style.display = 'none';
+                        return;
+                    }
+                    
+                    const x = (pos.x * 0.5 + 0.5) * width;
+                    const y = (-pos.y * 0.5 + 0.5) * height;
+                    
+                    icon.style.left = x + 'px';
+                    icon.style.top = y + 'px';
+                    icon.style.display = 'block';
+                });
+            },
+            
+            rebuild: function(hotspots) {
+                // إزالة القديمة
+                Object.values(this.markers).forEach(m => {
+                    if (m.parentNode) m.remove();
+                });
+                this.markers = {};
+                
+                if (!hotspots || !hotspots.length) return;
+                
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                // إنشاء نقاط جديدة
+                hotspots.forEach(h => {
+                    const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+                    const projected = pos.clone().project(camera);
+                    
+                    if (projected.z > 1) return;
+                    
+                    const x = (projected.x * 0.5 + 0.5) * width;
+                    const y = (-projected.y * 0.5 + 0.5) * height;
+                    
+                    if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
+                    
+                    this.create(x, y, h.type, h.data, h.id, pos);
+                });
+            }
+        };
         
         function initScenePanel() {
             const panel = document.getElementById('sceneListPanel');
@@ -510,133 +433,35 @@ canvas {
                 container.appendChild(item);
             });
         }
-function createHotspotElement(x, y, type, data) {
-    const div = document.createElement('div');
-    div.className = 'hotspot-marker';
-    div.style.cssText = `
-        left: ${x}px;
-        top: ${y}px;
-        position: absolute;
-        transform: translate(-50%, -50%);
-        cursor: pointer;
-        z-index: 1000;
-        pointer-events: auto;
-        transition: all 0.2s ease;
-    `;
-    
-    const iconUrl = type === 'SCENE' ? 'icon/hotspot.png' : 'icon/info.png';
-    const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-    const displayText = type === 'SCENE' 
-        ? (data.targetSceneName || 'انتقال') 
-        : (data.title || 'معلومات');
-    
-    div.innerHTML = `
-        <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
-        <div class="hotspot-label" style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none;">${displayText}</div>
-    `;
-    
-    // ✅ حدث النقر - بدون أي return
-    div.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
         
-        if (type === 'INFO') {
-            if (typeof showInfoWindow === 'function') {
-                showInfoWindow(data.title, data.content);
-            } else {
-                alert(data.title + '\n\n' + data.content);
-            }
-        } else {
-            const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-            if (targetIndex !== -1) {
-                this.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                setTimeout(function() {
-                    loadScene(targetIndex);
-                }, 300);
-            }
+        function showInfoWindow(title, content) {
+            // إزالة أي نافذة سابقة
+            const oldWindows = document.querySelectorAll('.custom-info-window');
+            oldWindows.forEach(w => w.remove());
+            
+            const win = document.createElement('div');
+            win.className = 'custom-info-window';
+            win.innerHTML = '<div class="window-header">' +
+                '<img src="' + ICONS.info + '">' +
+                '<h3>' + (title || 'معلومات') + '</h3>' +
+                '</div>' +
+                '<div class="window-content">' + (content || '') + '</div>' +
+                '<button class="window-close">حسناً</button>';
+            
+            win.querySelector('.window-close').onclick = function() {
+                win.remove();
+            };
+            
+            document.body.appendChild(win);
+            
+            setTimeout(() => win.remove(), 5000);
         }
-        // ❌ لا تكتب return هنا أبداً
-    };
-    
-    return div; // ✅ هذا هو return الصحيح الوحيد
-}
-   
-    
-       function showInfoWindow(title, content) {
-    // إزالة أي نافذة سابقة
-    const oldWindows = document.querySelectorAll('.custom-info-window');
-    oldWindows.forEach(w => w.remove());
-    
-    // إنشاء النافذة
-    const win = document.createElement('div');
-    win.className = 'custom-info-window';
-    win.style.cssText = `
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(20, 30, 40, 0.3);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(74, 108, 143, 0.3);
-        border-radius: 20px;
-        padding: 20px 30px;
-        color: white;
-        z-index: 10000;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        max-width: 400px;
-        width: 90%;
-        direction: rtl;
-        text-align: right;
-        pointer-events: auto;
-    `;
-    
-    win.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(74, 108, 143, 0.2);">
-            <img src="icon/info.png" style="width: 30px; height: 30px;">
-            <h3 style="margin: 0; color: #ffaa44; font-size: 18px;">${title || 'معلومات'}</h3>
-        </div>
-        <div style="margin-bottom: 20px; line-height: 1.6; font-size: 14px;">${content || ''}</div>
-        <button style="background: rgba(255,255,255,0.1); border: 1px solid rgba(74,108,143,0.3); color: white; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.2s;" 
-                onmouseover="this.style.background='rgba(74,108,143,0.5)'" 
-                onmouseout="this.style.background='rgba(255,255,255,0.1)'"
-                onclick="this.parentElement.remove()">حسناً</button>
-    `;
-    
-    document.body.appendChild(win);
-    
-    // إغلاق تلقائي بعد 5 ثوان
-    setTimeout(() => {
-        if (win.parentNode) win.remove();
-    }, 5000);
-}
         
         function rebuildHotspots() {
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-            hotspotMarkers = {};
-            
             const currentScene = scenes[currentSceneIndex];
             if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
             
-            const width = window.innerWidth, height = window.innerHeight;
-            
-            currentScene.hotspots.forEach(h => {
-                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-                pos.project(camera);
-                
-                if (pos.z > 1) return;
-                
-                const x = (pos.x * 0.5 + 0.5) * width;
-                const y = (-pos.y * 0.5 + 0.5) * height;
-                
-                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
-                
-                const iconElement = createHotspotElement(x, y, h.type, h.data);
-                iconElement._worldPosition = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-                iconElement.dataset.id = h.id;
-                document.body.appendChild(iconElement);
-                hotspotMarkers[h.id] = iconElement;
-            });
+            HotspotManager.rebuild(currentScene.hotspots);
         }
         
         function togglePathsByType(type, visible) {
@@ -666,7 +491,11 @@ function createHotspotElement(x, y, type, data) {
             currentSceneIndex = index;
             
             if (sphereMesh) scene3D.remove(sphereMesh);
+            
+            // إزالة الأيقونات القديمة
+            HotspotManager.markers = {};
             document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+            
             allPaths.forEach(p => scene3D.remove(p));
             allPaths = [];
             
@@ -719,7 +548,7 @@ function createHotspotElement(x, y, type, data) {
                     });
                 }
                 
-                setTimeout(rebuildHotspots, 200);
+                setTimeout(() => rebuildHotspots(), 200);
                 updateSceneList();
             });
         }
@@ -755,7 +584,7 @@ function createHotspotElement(x, y, type, data) {
                         autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
                 };
 
-               createPathsTogglePanel();
+                createPathsTogglePanel();
                 initScenePanel();
                 loadScene(0);
                 
@@ -763,14 +592,16 @@ function createHotspotElement(x, y, type, data) {
                     camera.aspect = window.innerWidth / window.innerHeight;
                     camera.updateProjectionMatrix();
                     renderer.setSize(window.innerWidth, window.innerHeight);
-                    rebuildHotspots();
+                    HotspotManager.updatePositions();
                 });
                 
                 function animate() {
                     requestAnimationFrame(animate);
                     controls.update();
                     renderer.render(scene3D, camera);
-                    rebuildHotspots();
+                    
+                    // تحديث المواقع فقط - بدون إعادة إنشاء
+                    HotspotManager.updatePositions();
                 }
                 animate();
             })
@@ -778,16 +609,28 @@ function createHotspotElement(x, y, type, data) {
                 console.error('خطأ في تحميل البيانات:', err); 
             });
    </script>
-<script>
-// تأخير تطبيق الأنماط بعد تحميل كل شيء
-setTimeout(function() {
-    document.querySelectorAll('.hotspot-marker').forEach(el => {
-        el.style.pointerEvents = 'auto';
-        el.style.cursor = 'pointer';
-    });
-    console.log('✅ تم تفعيل النقر على الأيقونات');
-}, 1000);
-</script>
+   
+   <script>
+        // تأكيد تفعيل النقر بعد التحميل
+        setTimeout(function() {
+            document.querySelectorAll('.hotspot-marker').forEach(el => {
+                el.style.pointerEvents = 'auto';
+                el.style.cursor = 'pointer';
+                el.style.zIndex = '10000';
+            });
+            console.log('✅ تم تفعيل النقر على الأيقونات');
+        }, 1000);
+    </script>
+    
+    <script>
+        // إصلاح إضافي - إعادة تعيين الأنماط بشكل دوري
+        setInterval(function() {
+            document.querySelectorAll('.hotspot-marker').forEach(el => {
+                el.style.pointerEvents = 'auto';
+                el.style.cursor = 'pointer';
+            });
+        }, 5000);
+    </script>
 
 </body>
 </html>
