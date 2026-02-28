@@ -473,7 +473,7 @@
                 container.appendChild(item);
             });
         }
- function createHotspotElement(x, y, type, data) {
+function createHotspotElement(x, y, type, data) {
     const div = document.createElement('div');
     div.className = 'hotspot-marker';
     div.style.cssText = `
@@ -495,15 +495,13 @@
     
     div.innerHTML = `
         <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
-        <div style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none; z-index:1001;">${displayText}</div>
+        <div class="hotspot-label" style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none;">${displayText}</div>
     `;
     
-    // ✅ حدث النقر - بدون return false
+    // ✅ حدث النقر - بدون أي return
     div.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
-        
-        console.log('🖱️ Clicked:', type, data);
         
         if (type === 'INFO') {
             if (typeof showInfoWindow === 'function') {
@@ -515,24 +513,26 @@
             const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
             if (targetIndex !== -1) {
                 this.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                setTimeout(() => loadScene(targetIndex), 300);
+                setTimeout(function() {
+                    loadScene(targetIndex);
+                }, 300);
             }
         }
-        // ❌ لا تكتب return false هنا
+        // ❌ لا تكتب return هنا أبداً
     };
     
     // حدث hover
     div.onmouseenter = function() {
-        const label = this.querySelector('div');
+        const label = this.querySelector('.hotspot-label');
         if (label) label.style.opacity = '1';
     };
     
     div.onmouseleave = function() {
-        const label = this.querySelector('div');
+        const label = this.querySelector('.hotspot-label');
         if (label) label.style.opacity = '0';
     };
     
-    return div; // ✅ هذا هو return الصحيح
+    return div; // ✅ هذا هو return الصحيح الوحيد
 }
     
     // حدث hover
