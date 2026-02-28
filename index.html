@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>tour-1772144842437 - جولة افتراضية</title>
+    <title>tour-1772251953359 - جولة افتراضية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -11,7 +11,6 @@
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; direction: rtl; }
         #container { width: 100vw; height: 100vh; background: #000; }
         
-        /* معلومات المشروع */
         .info {
             position: absolute; top: 20px; left: 20px;
             background: rgba(0, 0, 0, 0.7); color: white;
@@ -20,7 +19,6 @@
             font-weight: bold; backdrop-filter: blur(5px); font-size: 14px;
         }
         
-        /* زر التدوير */
         #autoRotateBtn {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             padding: 12px 24px; background: rgba(0, 0, 0, 0.7); color: white;
@@ -30,7 +28,6 @@
         }
         #autoRotateBtn:hover { background: rgba(74, 108, 143, 0.8); transform: translateX(-50%) scale(1.05); }
         
-        /* قائمة المشاهد الجانبية */
         .scene-list-panel {
             position: fixed; top: 50%; left: 20px; transform: translateY(-50%);
             width: 260px; max-height: 70vh;
@@ -75,7 +72,6 @@
         .scene-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .scene-hotspot-count { font-size: 11px; background: rgba(74, 108, 143, 0.4); padding: 2px 6px; border-radius: 12px; color: #88aaff; }
         
-        /* لوحة التحكم بالمسارات */
         .paths-control-panel {
             position: fixed; top: 20px; right: 20px;
             background: rgba(20, 30, 40, 0.85); backdrop-filter: blur(10px);
@@ -90,7 +86,6 @@
         .path-toggle-item label { flex: 1; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .path-color-dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
         
-        /* نظام Hotspots - مطابق للأداة */
         .hotspot-marker {
             position: absolute; transform: translate(-50%, -50%);
             cursor: pointer; z-index: 100; transition: all 0.2s ease;
@@ -114,7 +109,6 @@
         }
         .hotspot-marker:hover .hotspot-label { opacity: 1; }
         
-        /* نافذة المعلومات */
         .custom-info-window {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(20, 30, 40, 0.95); backdrop-filter: blur(10px);
@@ -141,7 +135,6 @@
             to { transform: translate(-50%, 0); opacity: 1; }
         }
         
-        /* تحسينات للموبايل */
         @media (max-width: 768px) {
             .scene-list-panel { width: 200px; left: 10px; }
             .scene-list-panel.collapsed { width: 40px; }
@@ -155,7 +148,7 @@
     </style>
 </head>
 <body>
-    <div class="info">🏗️ tour-1772144842437</div>
+    <div class="info">🏗️ tour-1772251953359</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
     
@@ -173,6 +166,11 @@
     </div>
 
     <script>
+        const ICONS = {
+            hotspot: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAIzSURBVFiF7ZbNaxNBGMZ/djdpk0hS9KIoigp68RRyUw8iKHgRLyIoePCi4F8g3nrwU0Tx4lEQvSh4EcF78NqLIAp68SNoFZE2TdMk3R2f2SSbdNPd2Z0NIvpAXjLMvM/8ZucjMwsHqIEa+J+hlJpOkrS0Z0mS1NM0nSu7l+M4h5VSy1rrn1rrb6W4LmBZ1hWl1LKUsl3L+t+01rdLcUMApdRVpdTC3r6iKOqMx+O+UsoPw/CFlHK1lFoJMAzjiVJqRQgR+b5/37Ks4+Fw+DaKovvtdvux4ziLUkq/LEcIYVvW3SRJ+lLKL5qmZ9I0HUopDc/zTmZZtpZlWZJl2YYoG4MQYgSAYRgIIW5IKZ1iPGmaXgPA8zySJOlKKdM0TdM0rZfRB8iyrC2lTNI0nSmKIl3X69M0PTRN0+WyHMa11pckSRohhC2l/JYkyXBRPrdt25RSr5Zl3zFN88F4PP4mpdwJguBpFEX3m83mGRhzLwjDMHzJmP0wDMMXWZZ93G63H5fN78sopdA5N0opP0mSl/P5vN5sNh/zAymE+LqcT2uN1jqRUn6Joqg9nU4fFNM2DMMo2l95GGP/SylvR1H0oEifMzsIgoNSyjaMpZRfl8vlvTAMP0dRdG/btvu+7z9jzG4X6Wc3j8OYe7Lf75+M47hXdXyUUh8BgDF7yhj7yZhbzOfz22maHjPGTjPGxJ+WnzE2Wq/Xh5RSl1ar1Yk8zzvL5fJ4GIa9JEk6URT1lFL9NE17cRwfybLsp9Z6tVqtDsI4fAtjX6rGgRrY4/wCJ8zvggPQ/IEAAAAASUVORK5CYII=',
+            info: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAI5SURBVFiF7ZbPaxNBFMfnt5vdJBIp1l6kFQU9eCk9tQcVBC+iIAgK4kXw7l/w4EEQ70178aAHQfBPRBCvXrwIgqBQ6FURtPUDLVIrSdP9MW+TTbrZzWazWwX7hQWZZeZ95v2Y994bGAVK0P8ZY2yP1rohpXzDOS9JKfcaY56Ypvk4DMMyY+xrFEWJ53nblFKPm812qVR6qJRa55w/aF3GGJ9zHiqlZqIoOgIAtm2f6nQ6FxhjZZZlH6IoOtsfhzF2l2VZXSlV55y/CYLgJgCkaToex/G0lHIGAAqFgimESBhjUwCglNqqlPoqhIgBQEq5GEXRac55RUr5xXGcQQBQSq2GYfgGAJRS61LKz4yxm2EYjhbzL5VKawBgrgM3DONBEARHlFKbAIBS6nOl1B6l1DwA6Hq9frRQKNSiKNohl6vVal+hUNjfbDaPAkCxWHzKGNtXKBSqk8nksWEYZ5Ikqbquu1Yul2d938+63e5UoVA4I6W8CgC2bT9JkuQeAGRZ5gOAaZqjUkpTSrmZZdl9pVQtSZJ7xWKxBAA6jmOO42wIIa4BQLlcDjjn3w3DqAkhVgGAc34tjuM5pdS8EOJXmUwmE0KIvQDAOT8KACzLspc8z3vLGJuJomg6TVPP87zJLMu8TqfzI89zLwiCvZxzkWVZP5/P5wFgLMs2pJTVKIp6nPOs2Wx+Y4z9FkKcBICRUmkpy7K6lPJGHMfHS6XSEs65ZVnWbD6f38rzfMxxnM+B759I0/Qp5/w4Y6wQJMl2IcRcGIaHhRDbgyB4JKU8yRirCiE+D7z/H6AE9Y1+As0ZxH2vO/WTAAAAAElFTkSuQmCC'
+        };
+
         let autoRotate = true;
         let currentSceneIndex = 0;
         let scenes = [];
@@ -182,7 +180,6 @@
         
         const pathColors = { EL: '#ffcc00', AC: '#00ccff', WP: '#0066cc', WA: '#ff3300', GS: '#33cc33' };
         
-        // دوال القائمة الجانبية
         function initScenePanel() {
             const panel = document.getElementById('sceneListPanel');
             const toggleBtn = document.getElementById('togglePanelBtn');
@@ -211,14 +208,13 @@
             });
         }
         
-        // دوال Hotspots - مطابقة للأداة
         function createHotspotElement(x, y, type, data) {
             const div = document.createElement('div');
             div.className = 'hotspot-marker';
             div.style.left = x + 'px';
             div.style.top = y + 'px';
             
-            const iconUrl = type === 'SCENE' ? 'icon/hotspot.png' : 'icon/info.png';
+            const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
             const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
             const displayText = type === 'SCENE' 
                 ? (data.targetSceneName || 'انتقال') 
@@ -230,14 +226,41 @@
             `;
             
             if (type === 'INFO') {
-                div.addEventListener('click', () => showInfoWindow(data.title, data.content));
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showInfoWindow(data.title, data.content);
+                });
             } else {
-                div.addEventListener('click', () => {
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-                    if (targetIndex !== -1) loadScene(targetIndex);
+                    if (targetIndex !== -1) {
+                        loadScene(targetIndex);
+                    }
                 });
             }
+            
             return div;
+        }
+        
+        function showInfoWindow(title, content) {
+            document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
+            
+            const win = document.createElement('div');
+            win.className = 'custom-info-window';
+            win.innerHTML = `
+                <div class="window-header">
+                    <img src="${ICONS.info}">
+                    <h3>${title || 'معلومات'}</h3>
+                </div>
+                <div class="window-content">${content || ''}</div>
+                <button class="window-close">حسناً</button>
+            `;
+            
+            win.querySelector('.window-close').onclick = () => win.remove();
+            document.body.appendChild(win);
+            
+            setTimeout(() => win.remove(), 5000);
         }
         
         function rebuildHotspots() {
@@ -252,37 +275,22 @@
             currentScene.hotspots.forEach(h => {
                 const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
                 pos.project(camera);
+                
+                if (pos.z > 1) return;
+                
                 const x = (pos.x * 0.5 + 0.5) * width;
                 const y = (-pos.y * 0.5 + 0.5) * height;
                 
-                if (x < 0 || x > width || y < 0 || y > height) return;
+                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
                 
                 const iconElement = createHotspotElement(x, y, h.type, h.data);
+                iconElement._worldPosition = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
                 iconElement.dataset.id = h.id;
                 document.body.appendChild(iconElement);
                 hotspotMarkers[h.id] = iconElement;
             });
         }
-        
-        function showInfoWindow(title, content) {
-            const oldWindow = document.querySelector('.custom-info-window');
-            if (oldWindow) oldWindow.remove();
-            
-            const win = document.createElement('div');
-            win.className = 'custom-info-window';
-            win.innerHTML = `
-                <div class="window-header">
-                    <img src="icon/info.png">
-                    <h3>${title || 'معلومات'}</h3>
-                </div>
-                <div class="window-content">${content || ''}</div>
-                <button class="window-close" onclick="this.parentElement.remove()">حسناً</button>
-            `;
-            document.body.appendChild(win);
-            setTimeout(() => win.remove(), 5000);
-        }
-        
-        // دوال المسارات
+
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData?.type === type) p.visible = visible; });
         }
@@ -329,31 +337,43 @@
                     sceneData.paths.forEach(pathData => {
                         const points = pathData.points.map(p => new THREE.Vector3(p.x, p.y, p.z));
                         for (let i = 0; i < points.length - 1; i++) {
-                            const start = points[i], end = points[i + 1];
+                            const start = points[i];
+                            const end = points[i + 1];
                             const direction = new THREE.Vector3().subVectors(end, start);
                             const distance = direction.length();
                             if (distance < 5) continue;
                             
                             const cylinder = new THREE.Mesh(
                                 new THREE.CylinderGeometry(3.5, 3.5, distance, 12),
-                                new THREE.MeshStandardMaterial({ color: pathData.color, emissive: pathData.color, emissiveIntensity: 0.3 })
+                                new THREE.MeshStandardMaterial({ 
+                                    color: pathData.color, 
+                                    emissive: pathData.color, 
+                                    emissiveIntensity: 0.3 
+                                })
                             );
-                            const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
-                            cylinder.applyQuaternion(quaternion);
-                            cylinder.position.copy(new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5));
+                            
+                            const midpoint = new THREE.Vector3().addVectors(start, end).multiplyScalar(0.5);
+                            cylinder.position.copy(midpoint);
+                            
+                            cylinder.lookAt(end);
+                            cylinder.rotateX(Math.PI / 2);
+                            
                             cylinder.userData = { type: pathData.type };
                             scene3D.add(cylinder);
                             allPaths.push(cylinder);
                         }
                     });
-                    document.querySelectorAll('#paths-toggle-list input').forEach(cb => togglePathsByType(cb.dataset.type, cb.checked));
+                    
+                    document.querySelectorAll('#paths-toggle-list input').forEach(cb => {
+                        togglePathsByType(cb.dataset.type, cb.checked);
+                    });
                 }
                 
                 setTimeout(rebuildHotspots, 200);
                 updateSceneList();
             });
         }
-        // التهيئة
+        
         fetch('tour-data.json')
             .then(res => res.json())
             .then(data => {
@@ -362,7 +382,7 @@
                 scene3D = new THREE.Scene();
                 scene3D.background = new THREE.Color(0x000000);
                 
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
                 camera.position.set(0, 0, 0.1);
                 
                 renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -381,7 +401,8 @@
                 document.getElementById('autoRotateBtn').onclick = () => {
                     autoRotate = !autoRotate;
                     controls.autoRotate = autoRotate;
-                    document.getElementById('autoRotateBtn').textContent = autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
+                    document.getElementById('autoRotateBtn').textContent = 
+                        autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
                 };
                 
                 createPathsTogglePanel();
@@ -399,7 +420,7 @@
                     requestAnimationFrame(animate);
                     controls.update();
                     renderer.render(scene3D, camera);
-                    rebuildHotspots(); // تحديث مستمر لمواقع النقاط
+                    rebuildHotspots();
                 }
                 animate();
             })
