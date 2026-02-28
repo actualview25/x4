@@ -87,7 +87,7 @@
             cursor: pointer !important;
             z-index: 1000;
             pointer-events: auto !important;
-            transition: transform 0.2s ease;
+            transition: none; /* إزالة الحركة تماماً */
             will-change: left, top;
         }
         .hotspot-marker img {
@@ -162,7 +162,6 @@
     </style>
 </head>
 <body>
-
     <div class="info">🏗️ جولة افتراضية</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
@@ -186,6 +185,7 @@
         let scene3D, camera, renderer, controls, sphereMesh;
         let allPaths = [];
         let hotspotMarkers = {};
+        let sceneHotspots = {}; // تخزين النقاط لكل مشهد
         
         // بيانات المشاهد
         const scenes = [
@@ -245,6 +245,11 @@
             }
         ];
 
+        // تخزين النقاط لكل مشهد
+        scenes.forEach(scene => {
+            sceneHotspots[scene.id] = scene.hotspots || [];
+        });
+
         function initScenePanel() {
             const panel = document.getElementById('sceneListPanel');
             const toggleBtn = document.getElementById('togglePanelBtn');
@@ -269,10 +274,11 @@
             });
         }
         
-        function createHotspotElement(x, y, type, data) {
+        function createHotspotElement(x, y, type, data, id) {
             const div = document.createElement('div');
             div.className = 'hotspot-marker';
             div.style.cssText = `left:${x}px; top:${y}px; position:absolute; transform:translate(-50%,-50%); cursor:pointer; z-index:1000; pointer-events:auto;`;
+            div.dataset.id = id;
             
             const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
             const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
@@ -330,11 +336,10 @@
                 const x = (projected.x * 0.5 + 0.5) * width;
                 const y = (-projected.y * 0.5 + 0.5) * height;
                 
-                if (x < -200 || x > width + 200 || y < -200 || y > height + 200) return;
+                if (x < -500 || x > width + 500 || y < -500 || y > height + 500) return;
                 
-                const icon = createHotspotElement(x, y, h.type, h.data);
+                const icon = createHotspotElement(x, y, h.type, h.data, h.id);
                 icon._worldPosition = pos.clone();
-                icon.dataset.id = h.id;
                 document.body.appendChild(icon);
                 hotspotMarkers[h.id] = icon;
             });
@@ -344,7 +349,6 @@
             if (!camera) return;
             
             const width = window.innerWidth, height = window.innerHeight;
-            let needsUpdate = false;
             
             Object.values(hotspotMarkers).forEach(icon => {
                 if (!icon._worldPosition) return;
@@ -352,29 +356,17 @@
                 const pos = icon._worldPosition.clone().project(camera);
                 
                 if (pos.z > 1) {
-                    if (icon.style.display !== 'none') {
-                        icon.style.display = 'none';
-                        needsUpdate = true;
-                    }
+                    icon.style.display = 'none';
                     return;
                 }
                 
                 const x = (pos.x * 0.5 + 0.5) * width;
                 const y = (-pos.y * 0.5 + 0.5) * height;
                 
-                if (Math.abs(parseFloat(icon.style.left) - x) > 1 || Math.abs(parseFloat(icon.style.top) - y) > 1) {
-                    icon.style.left = x + 'px';
-                    icon.style.top = y + 'px';
-                    needsUpdate = true;
-                }
-                
-                if (icon.style.display !== 'block') {
-                    icon.style.display = 'block';
-                    needsUpdate = true;
-                }
+                icon.style.left = x + 'px';
+                icon.style.top = y + 'px';
+                icon.style.display = 'block';
             });
-            
-            return needsUpdate;
         }
         
         function loadScene(index) {
@@ -383,7 +375,7 @@
             
             currentSceneIndex = index;
             
-            // تنظيف كامل
+            // تنظيف المشهد القديم
             if (sphereMesh) scene3D.remove(sphereMesh);
             sphereMesh = null;
             
@@ -406,10 +398,8 @@
                 );
                 scene3D.add(sphereMesh);
                 
-                // إعادة بناء النقاط بعد تحميل المشهد
-                setTimeout(() => {
-                    rebuildHotspots();
-                }, 100);
+                // إعادة بناء النقاط
+                rebuildHotspots();
             });
         }
         
@@ -448,9 +438,9 @@
             rebuildHotspots();
         });
         
-        // تحديث المواقع بشكل أقل تواتراً لمنع الاهتزاز
+        // تحديث المواقع بشكل أقل تواتراً
         let lastUpdate = 0;
-        const UPDATE_INTERVAL = 50; // تحديث كل 50ms
+        const UPDATE_INTERVAL = 100; // تحديث كل 100ms (10 مرات في الثانية)
         
         function animate(time) {
             requestAnimationFrame(animate);
