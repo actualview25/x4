@@ -398,36 +398,68 @@
     });
 }
         
-        fetch('tour-data.json')
-            .then(res => res.json())
-            .then(data => {
-                scenes = data;
-                
-                scene3D = new THREE.Scene();
-                scene3D.background = new THREE.Color(0x000000);
-                
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(0, 0, 0.1);
-                
-                renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                document.getElementById('container').appendChild(renderer.domElement);
-                
-                scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
-                
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableZoom = true;
-                controls.enablePan = false;
-                controls.enableDamping = true;
-                controls.autoRotate = autoRotate;
-                controls.autoRotateSpeed = 0.5;
-                
-                document.getElementById('autoRotateBtn').onclick = function() {
-                    autoRotate = !autoRotate;
-                    controls.autoRotate = autoRotate;
-                    document.getElementById('autoRotateBtn').textContent = 
-                        autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
-                };
+       fetch('tour-data.json')
+    .then(res => res.json())
+    .then(data => {
+        scenes = data;
+
+        // إنشاء المشهد
+        scene3D = new THREE.Scene();
+        scene3D.background = new THREE.Color(0x000000);
+
+        // الكاميرا
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 0.1);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        // إضاءة
+        scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
+
+        // Controls
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableZoom = true;
+        controls.enablePan = false;
+        controls.enableDamping = true;
+        controls.autoRotate = autoRotate;
+        controls.autoRotateSpeed = 0.5;
+
+        // زر تشغيل/إيقاف الدوران
+        document.getElementById('autoRotateBtn').onclick = function() {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+            document.getElementById('autoRotateBtn').textContent = 
+                autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
+        };
+
+        // إنشاء لوحة المشاهد ولوحة المسارات
+        createPathsTogglePanel();
+        initScenePanel();
+
+        // تحميل المشهد الأول
+        loadScene(0);
+
+        // التعامل مع تغيير حجم الشاشة
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            rebuildHotspots();
+        });
+
+        // حلقة الرسم لتحديث Controls والمشهد باستمرار
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene3D, camera);
+        }
+        animate();
+
+    })
+    .catch(err => console.error('فشل تحميل tour-data.json:', err));
                 
                 createPathsTogglePanel();
                 initScenePanel();
@@ -441,11 +473,11 @@
                 });
                 
                 function animate() {
-                    requestAnimationFrame(animate);
-                    controls.update();
-                    renderer.render(scene3D, camera);
-                    rebuildHotspots();
-                }
+    requestAnimationFrame(animate);
+    controls.update();
+    rebuildHotspots();
+    renderer.render(scene3D, camera);
+}
                 animate();
             })
             .catch(err => console.error('خطأ في تحميل البيانات:', err));
