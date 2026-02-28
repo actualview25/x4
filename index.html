@@ -422,12 +422,46 @@
                     renderer.setSize(window.innerWidth, window.innerHeight);
                     rebuildHotspots();
                 });
-                
+                function updateHotspotsPosition() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    Object.values(hotspotMarkers).forEach(el => {
+        if (!el._worldPosition) return;
+
+        const projected = el._worldPosition.clone().project(camera);
+
+        if (projected.z > 1) {
+            el.style.display = 'none';
+            return;
+        }
+
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
+
+        if (
+            x < -100 || x > width + 100 ||
+            y < -100 || y > height + 100
+        ) {
+            el.style.display = 'none';
+            return;
+        }
+
+        el.style.display = 'block';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+    });
+}
                 function animate() {
                     requestAnimationFrame(animate);
                     controls.update();
                     renderer.render(scene3D, camera);
-                    rebuildHotspots();
+                    function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene3D, camera);
+    updateHotspotsPosition(); // ✅ سنضعها بدلًا منه
+}
                 }
                 animate();
             })
