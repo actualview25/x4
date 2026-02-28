@@ -342,9 +342,13 @@ canvas {
         // =======================================
 // مدير Hotspots المتطور - ثابت + نقر
 // =======================================
+// =======================================
+// مدير Hotspots المتطور - ثابت + نقر
+// =======================================
 const HotspotManager = {
     markers: {},
     
+    // دالة إنشاء نقطة جديدة
     create: function(x, y, type, data, id, worldPos) {
         const div = document.createElement('div');
         div.className = 'hotspot-marker';
@@ -409,8 +413,9 @@ const HotspotManager = {
         this.markers[id] = div;
         
         return div;
-    },
+    },  // <-- تأكد من وجود الفاصلة هنا
     
+    // دالة تحديث المواقع
     updatePositions: function() {
         if (!camera) return;
         
@@ -434,8 +439,9 @@ const HotspotManager = {
             icon.style.top = y + 'px';
             icon.style.display = 'block';
         });
-    },
+    },  // <-- تأكد من وجود الفاصلة هنا
     
+    // دالة إعادة بناء النقاط
     rebuild: function(hotspots) {
         // إزالة القديمة
         Object.values(this.markers).forEach(m => {
@@ -462,8 +468,8 @@ const HotspotManager = {
             
             this.create(x, y, h.type, h.data, h.id, pos);
         });
-    }
-};
+    }  // <-- لا فاصلة بعد آخر دالة
+};  // <-- نقطة الفاصلة المنقوطة هنا
         
         function initScenePanel() {
             const panel = document.getElementById('sceneListPanel');
