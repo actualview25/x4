@@ -413,6 +413,43 @@
     border: 1px solid rgba(74, 108, 143, 0.3) !important;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
 }    
+/* ===== حل مشكلة النقر على الأيقونات ===== */
+
+/* التأكد من أن الأيقونات تستقبل النقر */
+.hotspot-marker {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    z-index: 10000 !important;  /* طبقة عالية جداً */
+}
+
+/* الصورة لا تمنع النقر */
+.hotspot-marker img {
+    pointer-events: none !important;
+}
+
+/* التأكد من عدم وجود عناصر تحجب الأيقونات */
+#container {
+    pointer-events: none !important;  /* الحاوية لا تمنع النقر */
+}
+
+canvas {
+    pointer-events: none !important;  /* عنصر canvas لا يمنع النقر */
+}
+
+/* توسيع منطقة النقر */
+.hotspot-marker::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    z-index: 9999;
+}
     </style>
 </head>
 <body>
