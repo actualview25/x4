@@ -556,31 +556,54 @@
     
     return div;
 }
-        
-        function showInfoWindow(title, content) {
-            // إزالة أي نافذة سابقة
-            document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
-            
-            const win = document.createElement('div');
-            win.className = 'custom-info-window';
-            win.innerHTML = '<div class="window-header">' +
-                '<img src="' + ICONS.info + '">' +
-                '<h3>' + (title || 'معلومات') + '</h3>' +
-                '</div>' +
-                '<div class="window-content">' + (content || '') + '</div>' +
-                '<button class="window-close">حسناً</button>';
-            
-            win.querySelector('.window-close').onclick = function() {
-                win.remove();
-            };
-            
-            document.body.appendChild(win);
-            
-            // إغلاق تلقائي بعد 5 ثوان
-            setTimeout(function() {
-                if (win.parentNode) win.remove();
-            }, 5000);
-        }
+       function showInfoWindow(title, content) {
+    // إزالة أي نافذة سابقة
+    const oldWindows = document.querySelectorAll('.custom-info-window');
+    oldWindows.forEach(w => w.remove());
+    
+    // إنشاء النافذة
+    const win = document.createElement('div');
+    win.className = 'custom-info-window';
+    win.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(20, 30, 40, 0.3);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(74, 108, 143, 0.3);
+        border-radius: 20px;
+        padding: 20px 30px;
+        color: white;
+        z-index: 10000;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 90%;
+        direction: rtl;
+        text-align: right;
+        pointer-events: auto;
+    `;
+    
+    win.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid rgba(74, 108, 143, 0.2);">
+            <img src="icon/info.png" style="width: 30px; height: 30px;">
+            <h3 style="margin: 0; color: #ffaa44; font-size: 18px;">${title || 'معلومات'}</h3>
+        </div>
+        <div style="margin-bottom: 20px; line-height: 1.6; font-size: 14px;">${content || ''}</div>
+        <button style="background: rgba(255,255,255,0.1); border: 1px solid rgba(74,108,143,0.3); color: white; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; width: 100%; transition: all 0.2s;" 
+                onmouseover="this.style.background='rgba(74,108,143,0.5)'" 
+                onmouseout="this.style.background='rgba(255,255,255,0.1)'"
+                onclick="this.parentElement.remove()">حسناً</button>
+    `;
+    
+    document.body.appendChild(win);
+    
+    // إغلاق تلقائي بعد 5 ثوان
+    setTimeout(() => {
+        if (win.parentNode) win.remove();
+    }, 5000);
+}
         
         function rebuildHotspots() {
             document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
