@@ -521,12 +521,6 @@ function createHotspotElement(x, y, type, data) {
         // ❌ لا تكتب return هنا أبداً
     };
     
-   
-    div.onmouseleave = function() {
-        const label = this.querySelector('.hotspot-label');
-        if (label) label.style.opacity = '0';
-    };
-    
     return div; // ✅ هذا هو return الصحيح الوحيد
 }
    
