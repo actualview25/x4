@@ -518,45 +518,6 @@
                 updateSceneList();
             });
         }
-        
-        // بيانات تجريبية
-        const scenes = [
-            {
-                id: "scene-1",
-                name: "المشهد الأول",
-                image: "https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg",
-                paths: [],
-                hotspots: [
-                    {
-                        id: "hotspot-1",
-                        type: "INFO",
-                        position: { x: 100, y: 50, z: -200 },
-                        data: {
-                            title: "معلومات تجريبية",
-                            content: "هذه نقطة معلومات تجريبية"
-                        }
-                    },
-                    {
-                        id: "hotspot-2",
-                        type: "SCENE",
-                        position: { x: -100, y: 50, z: 200 },
-                        data: {
-                            targetSceneId: "scene-2",
-                            targetSceneName: "المشهد الثاني",
-                            description: "انتقال إلى المشهد الثاني"
-                        }
-                    }
-                ]
-            },
-            {
-                id: "scene-2",
-                name: "المشهد الثاني",
-                image: "https://threejs.org/examples/textures/2294472375_24a3b8ef46_o.jpg",
-                paths: [],
-                hotspots: []
-            }
-        ];
-        
         // بدء التشغيل
         scene3D = new THREE.Scene();
         scene3D.background = new THREE.Color(0x000000);
