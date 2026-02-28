@@ -521,12 +521,7 @@ function createHotspotElement(x, y, type, data) {
         // ❌ لا تكتب return هنا أبداً
     };
     
-    // حدث hover
-    div.onmouseenter = function() {
-        const label = this.querySelector('.hotspot-label');
-        if (label) label.style.opacity = '1';
-    };
-    
+   
     div.onmouseleave = function() {
         const label = this.querySelector('.hotspot-label');
         if (label) label.style.opacity = '0';
@@ -534,18 +529,8 @@ function createHotspotElement(x, y, type, data) {
     
     return div; // ✅ هذا هو return الصحيح الوحيد
 }
+   
     
-    // حدث hover
-    div.addEventListener('mouseenter', function() {
-        label.style.opacity = '1';
-    });
-    
-    div.addEventListener('mouseleave', function() {
-        label.style.opacity = '0';
-    });
-    
-    return div;
-}
        function showInfoWindow(title, content) {
     // إزالة أي نافذة سابقة
     const oldWindows = document.querySelectorAll('.custom-info-window');
