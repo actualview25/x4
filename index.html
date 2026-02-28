@@ -302,7 +302,8 @@ canvas {
 .hotspot-marker *:not(::after) {
     pointer-events: none;
 }
-    </style>
+
+</style>
 </head>
 <body>
     <div class="info">🏗️ tour-1772286978175</div>
@@ -335,141 +336,124 @@ canvas {
         let allPaths = [];
         
         const pathColors = { EL: '#ffcc00', AC: '#00ccff', WP: '#0066cc', WA: '#ff3300', GS: '#33cc33' };
-        
-        // =======================================
-        // مدير Hotspots المتطور - ثابت + نقر
-        // =======================================
-        // =======================================
-// مدير Hotspots المتطور - ثابت + نقر
-// =======================================
-// =======================================
-// مدير Hotspots المتطور - ثابت + نقر
-// =======================================
-const HotspotManager = {
-    markers: {},
-    
-    // دالة إنشاء نقطة جديدة
-    create: function(x, y, type, data, id, worldPos) {
-        const div = document.createElement('div');
-        div.className = 'hotspot-marker';
-        div.style.cssText = `
-            left: ${x}px;
-            top: ${y}px;
-            position: absolute;
-            transform: translate(-50%, -50%);
-            cursor: pointer;
-            z-index: 1000;
-            pointer-events: auto;
-            transition: all 0.2s ease;
-        `;
-        
-        // تخزين الموقع الثابت و ID
-        div._fixedPosition = worldPos.clone();
-        div.dataset.id = id;
-        
-        const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
-        const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-        const displayText = type === 'SCENE' 
-            ? (data.targetSceneName || 'انتقال') 
-            : (data.title || 'معلومات');
-        
-        div.innerHTML = `
-            <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
-            <div class="hotspot-label" style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none;">${displayText}</div>
-        `;
-        
-        // حدث النقر
-        div.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
+
+        const HotspotManager = {
+            markers: {},
             
-            if (type === 'INFO') {
-                if (typeof showInfoWindow === 'function') {
-                    showInfoWindow(data.title, data.content);
-                } else {
-                    alert(data.title + '\n\n' + data.content);
-                }
-            } else {
-                const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-                if (targetIndex !== -1) {
-                    this.style.transform = 'translate(-50%, -50%) scale(1.5)';
-                    setTimeout(() => loadScene(targetIndex), 300);
-                }
+            create: function(x, y, type, data, id, worldPos) {
+                const div = document.createElement('div');
+                div.className = 'hotspot-marker';
+                div.style.cssText = `
+                    left: ${x}px;
+                    top: ${y}px;
+                    position: absolute;
+                    transform: translate(-50%, -50%);
+                    cursor: pointer;
+                    z-index: 1000;
+                    pointer-events: auto;
+                    transition: all 0.2s ease;
+                `;
+                
+                div._fixedPosition = worldPos.clone();
+                div.dataset.id = id;
+                
+                const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
+                const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
+                const displayText = type === 'SCENE' 
+                    ? (data.targetSceneName || 'انتقال') 
+                    : (data.title || 'معلومات');
+                
+                div.innerHTML = `
+                    <img src="${iconUrl}" alt="${type}" style="width:40px; height:40px; border-radius:50%; border:2px solid ${borderColor}; background:rgba(0,0,0,0.3); display:block; pointer-events:none;">
+                    <div class="hotspot-label" style="position:absolute; top:-45px; left:50%; transform:translateX(-50%); background:rgba(20,30,40,0.95); backdrop-filter:blur(5px); color:white; padding:6px 12px; border-radius:20px; font-size:12px; white-space:nowrap; border:2px solid ${borderColor}; opacity:0; transition:opacity 0.2s; pointer-events:none;">${displayText}</div>
+                `;
+                
+                div.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    
+                    if (type === 'INFO') {
+                        if (typeof showInfoWindow === 'function') {
+                            showInfoWindow(data.title, data.content);
+                        } else {
+                            alert(data.title + '\n\n' + data.content);
+                        }
+                    } else {
+                        const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+                        if (targetIndex !== -1) {
+                            this.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                            setTimeout(() => loadScene(targetIndex), 300);
+                        }
+                    }
+                });
+                
+                div.addEventListener('mouseenter', function() {
+                    const label = this.querySelector('.hotspot-label');
+                    if (label) label.style.opacity = '1';
+                });
+                
+                div.addEventListener('mouseleave', function() {
+                    const label = this.querySelector('.hotspot-label');
+                    if (label) label.style.opacity = '0';
+                });
+                
+                document.body.appendChild(div);
+                this.markers[id] = div;
+                
+                return div;
+            },
+            
+            updatePositions: function() {
+                if (!camera) return;
+                
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                Object.values(this.markers).forEach(icon => {
+                    if (!icon._fixedPosition) return;
+                    
+                    const pos = icon._fixedPosition.clone().project(camera);
+                    
+                    if (pos.z > 1) {
+                        icon.style.display = 'none';
+                        return;
+                    }
+                    
+                    const x = (pos.x * 0.5 + 0.5) * width;
+                    const y = (-pos.y * 0.5 + 0.5) * height;
+                    
+                    icon.style.left = x + 'px';
+                    icon.style.top = y + 'px';
+                    icon.style.display = 'block';
+                });
+            },
+            
+            rebuild: function(hotspots) {
+                Object.values(this.markers).forEach(m => {
+                    if (m.parentNode) m.remove();
+                });
+                this.markers = {};
+                
+                if (!hotspots || !hotspots.length) return;
+                
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                
+                hotspots.forEach(h => {
+                    const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+                    const projected = pos.clone().project(camera);
+                    
+                    if (projected.z > 1) return;
+                    
+                    const x = (projected.x * 0.5 + 0.5) * width;
+                    const y = (-projected.y * 0.5 + 0.5) * height;
+                    
+                    if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
+                    
+                    this.create(x, y, h.type, h.data, h.id, pos);
+                });
             }
-        });
-        
-        // حدث hover
-        div.addEventListener('mouseenter', function() {
-            const label = this.querySelector('.hotspot-label');
-            if (label) label.style.opacity = '1';
-        });
-        
-        div.addEventListener('mouseleave', function() {
-            const label = this.querySelector('.hotspot-label');
-            if (label) label.style.opacity = '0';
-        });
-        
-        document.body.appendChild(div);
-        this.markers[id] = div;
-        
-        return div;
-    },  // <-- تأكد من وجود الفاصلة هنا
-    
-    // دالة تحديث المواقع
-    updatePositions: function() {
-        if (!camera) return;
-        
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        Object.values(this.markers).forEach(icon => {
-            if (!icon._fixedPosition) return;
-            
-            const pos = icon._fixedPosition.clone().project(camera);
-            
-            if (pos.z > 1) {
-                icon.style.display = 'none';
-                return;
-            }
-            
-            const x = (pos.x * 0.5 + 0.5) * width;
-            const y = (-pos.y * 0.5 + 0.5) * height;
-            
-            icon.style.left = x + 'px';
-            icon.style.top = y + 'px';
-            icon.style.display = 'block';
-        });
-    },  // <-- تأكد من وجود الفاصلة هنا
-    
-    // دالة إعادة بناء النقاط
-    rebuild: function(hotspots) {
-        // إزالة القديمة
-        Object.values(this.markers).forEach(m => {
-            if (m.parentNode) m.remove();
-        });
-        this.markers = {};
-        
-        if (!hotspots || !hotspots.length) return;
-        
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        
-        // إنشاء نقاط جديدة
-        hotspots.forEach(h => {
-            const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-            const projected = pos.clone().project(camera);
-            
-            if (projected.z > 1) return;
-            
-            const x = (projected.x * 0.5 + 0.5) * width;
-            const y = (-projected.y * 0.5 + 0.5) * height;
-            
-            if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
-            
-            this.create(x, y, h.type, h.data, h.id, pos);
-        });
-    }  // <-- لا فاصلة بعد آخر دالة
-};  // <-- نقطة الفاصلة المنقوطة هنا
+        };
         
         function initScenePanel() {
             const panel = document.getElementById('sceneListPanel');
@@ -498,7 +482,6 @@ const HotspotManager = {
         }
         
         function showInfoWindow(title, content) {
-            // إزالة أي نافذة سابقة
             const oldWindows = document.querySelectorAll('.custom-info-window');
             oldWindows.forEach(w => w.remove());
             
@@ -555,7 +538,6 @@ const HotspotManager = {
             
             if (sphereMesh) scene3D.remove(sphereMesh);
             
-            // إزالة الأيقونات القديمة
             HotspotManager.markers = {};
             document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
             
@@ -666,7 +648,9 @@ const HotspotManager = {
                     // تحديث المواقع فقط - بدون إعادة إنشاء
                     HotspotManager.updatePositions();
                 }
-              
+                
+                // ✅ هذا السطر كان مفقوداً - تشغيل animation
+                animate();
             })
             .catch(function(err) { 
                 console.error('خطأ في تحميل البيانات:', err); 
@@ -696,4 +680,4 @@ const HotspotManager = {
     </script>
 
 </body>
-</html>
+</html>        
