@@ -87,7 +87,8 @@
             cursor: pointer !important;
             z-index: 1000;
             pointer-events: auto !important;
-            transition: all 0.2s ease;
+            transition: transform 0.2s ease;
+            will-change: left, top;
         }
         .hotspot-marker img {
             width: 40px;
@@ -162,7 +163,7 @@
 </head>
 <body>
 
-   <div class="info">🏗️ جولة افتراضية</div>
+    <div class="info">🏗️ جولة افتراضية</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
     
@@ -186,7 +187,7 @@
         let allPaths = [];
         let hotspotMarkers = {};
         
-        // بيانات المشاهد - مع صورة مضمونة 100%
+        // بيانات المشاهد
         const scenes = [
             {
                 id: "scene-1",
@@ -199,8 +200,8 @@
                         type: "INFO",
                         position: { x: 100, y: 50, z: -200 },
                         data: {
-                            title: "معلومات",
-                            content: "هذه نقطة معلومات"
+                            title: "معلومات 1",
+                            content: "هذه نقطة معلومات في المشهد الأول"
                         }
                     },
                     {
@@ -210,7 +211,7 @@
                         data: {
                             targetSceneId: "scene-2",
                             targetSceneName: "المشهد الثاني",
-                            description: "انتقال"
+                            description: "انتقال إلى المشهد الثاني"
                         }
                     }
                 ]
@@ -220,7 +221,27 @@
                 name: "مشهد تجريبي 2",
                 image: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1024",
                 paths: [],
-                hotspots: []
+                hotspots: [
+                    {
+                        id: "hotspot-3",
+                        type: "INFO",
+                        position: { x: 150, y: 30, z: -150 },
+                        data: {
+                            title: "معلومات 2",
+                            content: "هذه نقطة معلومات في المشهد الثاني"
+                        }
+                    },
+                    {
+                        id: "hotspot-4",
+                        type: "SCENE",
+                        position: { x: -150, y: 30, z: 150 },
+                        data: {
+                            targetSceneId: "scene-1",
+                            targetSceneName: "المشهد الأول",
+                            description: "العودة للمشهد الأول"
+                        }
+                    }
+                ]
             }
         ];
 
@@ -266,7 +287,9 @@
                     showInfoWindow(data.title, data.content);
                 } else {
                     const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-                    if (targetIndex !== -1) setTimeout(() => loadScene(targetIndex), 300);
+                    if (targetIndex !== -1) {
+                        loadScene(targetIndex);
+                    }
                 }
             });
             
@@ -289,18 +312,26 @@
         }
         
         function rebuildHotspots() {
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+            // تنظيف القديم
+            Object.values(hotspotMarkers).forEach(marker => {
+                if (marker && marker.parentNode) marker.remove();
+            });
             hotspotMarkers = {};
+            
             const currentScene = scenes[currentSceneIndex];
             if (!currentScene?.hotspots?.length) return;
             
             const width = window.innerWidth, height = window.innerHeight;
+            
             currentScene.hotspots.forEach(h => {
                 const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
                 const projected = pos.clone().project(camera);
+                
                 const x = (projected.x * 0.5 + 0.5) * width;
                 const y = (-projected.y * 0.5 + 0.5) * height;
+                
                 if (x < -200 || x > width + 200 || y < -200 || y > height + 200) return;
+                
                 const icon = createHotspotElement(x, y, h.type, h.data);
                 icon._worldPosition = pos.clone();
                 icon.dataset.id = h.id;
@@ -311,38 +342,74 @@
         
         function updateHotspotPositions() {
             if (!camera) return;
+            
             const width = window.innerWidth, height = window.innerHeight;
+            let needsUpdate = false;
+            
             Object.values(hotspotMarkers).forEach(icon => {
                 if (!icon._worldPosition) return;
+                
                 const pos = icon._worldPosition.clone().project(camera);
-                if (pos.z > 1) { icon.style.display = 'none'; return; }
+                
+                if (pos.z > 1) {
+                    if (icon.style.display !== 'none') {
+                        icon.style.display = 'none';
+                        needsUpdate = true;
+                    }
+                    return;
+                }
+                
                 const x = (pos.x * 0.5 + 0.5) * width;
                 const y = (-pos.y * 0.5 + 0.5) * height;
-                icon.style.left = x + 'px';
-                icon.style.top = y + 'px';
-                icon.style.display = 'block';
+                
+                if (Math.abs(parseFloat(icon.style.left) - x) > 1 || Math.abs(parseFloat(icon.style.top) - y) > 1) {
+                    icon.style.left = x + 'px';
+                    icon.style.top = y + 'px';
+                    needsUpdate = true;
+                }
+                
+                if (icon.style.display !== 'block') {
+                    icon.style.display = 'block';
+                    needsUpdate = true;
+                }
             });
+            
+            return needsUpdate;
         }
         
         function loadScene(index) {
             const sceneData = scenes[index];
             if (!sceneData) return;
+            
             currentSceneIndex = index;
+            
+            // تنظيف كامل
             if (sphereMesh) scene3D.remove(sphereMesh);
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+            sphereMesh = null;
+            
+            Object.values(hotspotMarkers).forEach(marker => {
+                if (marker && marker.parentNode) marker.remove();
+            });
             hotspotMarkers = {};
             
+            updateSceneList();
+            
+            // تحميل المشهد الجديد
             new THREE.TextureLoader().load(sceneData.image, function(texture) {
                 texture.wrapS = THREE.RepeatWrapping;
                 texture.wrapT = THREE.RepeatWrapping;
                 texture.repeat.x = -1;
+                
                 sphereMesh = new THREE.Mesh(
                     new THREE.SphereGeometry(500, 128, 128),
                     new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide })
                 );
                 scene3D.add(sphereMesh);
-                setTimeout(() => rebuildHotspots(), 200);
-                updateSceneList();
+                
+                // إعادة بناء النقاط بعد تحميل المشهد
+                setTimeout(() => {
+                    rebuildHotspots();
+                }, 100);
             });
         }
         
@@ -378,16 +445,24 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            updateHotspotPositions();
+            rebuildHotspots();
         });
         
-        function animate() {
+        // تحديث المواقع بشكل أقل تواتراً لمنع الاهتزاز
+        let lastUpdate = 0;
+        const UPDATE_INTERVAL = 50; // تحديث كل 50ms
+        
+        function animate(time) {
             requestAnimationFrame(animate);
             controls.update();
             renderer.render(scene3D, camera);
-            updateHotspotPositions();
+            
+            if (time - lastUpdate > UPDATE_INTERVAL) {
+                updateHotspotPositions();
+                lastUpdate = time;
+            }
         }
         animate();
     </script>
 </body>
-</html> 
+</html>
