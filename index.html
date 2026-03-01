@@ -217,8 +217,8 @@
                 container.appendChild(item);
             });
         }
-        
-        function createHotspotElement(x, y, type, data) {
+        function createHotspotElement(x, y, type, data) {  type = type.toUpperCase(); // ✅
+        }
             const div = document.createElement('div');
             div.className = 'hotspot-marker';
             div.style.left = x + 'px';
@@ -376,10 +376,11 @@
                     });
                 }
                 
-                setTimeout(rebuildHotspots, 200);
-                updateSceneList();
-            });
-        }
+                    setTimeout(() => {
+                    rebuildHotspots();
+                    updateHotspotsPosition(); // ✅ مهم}, 200);
+                    });
+                }
         
         fetch('tour-data.json')
             .then(res => res.json())
