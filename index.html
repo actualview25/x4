@@ -181,6 +181,39 @@
             .hotspot-marker img { width: 35px; height: 35px; }
             #autoRotateBtn { font-size: 14px; padding: 10px 20px; }
         }
+        .info-popup {
+    position: absolute;
+    min-width: 220px;
+    max-width: 320px;
+    background: rgba(20, 30, 40, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid #ffaa44;
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: white;
+    z-index: 2000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none;
+    pointer-events: auto;
+}
+
+.info-popup h4 {
+    margin: 0 0 6px 0;
+    font-size: 14px;
+    color: #ffaa44;
+}
+
+.info-popup .content {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.info-popup img,
+.info-popup video {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 6px;
+}
     </style>
 </head>
 <body>
