@@ -463,44 +463,44 @@
       });
       
       // دالة تحديث مواقع الهوتسبوت
-      function updateHotspotsPosition() {
-          const width = window.innerWidth;
-          const height = window.innerHeight;
+     function updateHotspotsPosition() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-          Object.values(hotspotMarkers).forEach(el => {
-              if (!el._worldPosition) return;
+    Object.values(hotspotMarkers).forEach(el => {
+        if (!el._worldPosition) return;
 
-              const projected = el._worldPosition.clone().project(camera);
+        const projected = el._worldPosition.clone().project(camera);
 
-              if (projected.z > 1) {
-                  el.style.display = 'none';
-                  return;
-              }
+        if (projected.z > 1) {
+            el.style.display = 'none';
+            return;
+        }
 
-              const x = (projected.x * 0.5 + 0.5) * width;
-              const y = (-projected.y * 0.5 + 0.5) * height;
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
 
-              if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-                  el.style.display = 'none';
-                  return;
-              }
+        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+            el.style.display = 'none';
+            return;
+        }
 
-              el.style.display = 'block';
-              el.style.left = x + 'px';
-              el.style.top = y + 'px';
-          });
-      }
+        el.style.display = 'block';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+    });
+}
 
-      // دالة التحريك
-      function animate() {
-          requestAnimationFrame(animate);
-          controls.update();
-          renderer.render(scene3D, camera);
-          updateHotspotsPosition();
-      }
+// دالة التحريك (واحدة فقط)
+function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene3D, camera);
+    updateHotspotsPosition();
+}
 
-     function animate() { 
-  });              
+// بدء الأنيميشن
+animate();
     </script>
 </body>
 </html> 
