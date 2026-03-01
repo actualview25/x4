@@ -422,7 +422,8 @@
                     renderer.setSize(window.innerWidth, window.innerHeight);
                     rebuildHotspots();
                 });
-                function updateHotspotsPosition() {
+              // تحديث مواقع الهوتسبوت
+function updateHotspotsPosition() {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
@@ -439,10 +440,7 @@
         const x = (projected.x * 0.5 + 0.5) * width;
         const y = (-projected.y * 0.5 + 0.5) * height;
 
-        if (
-            x < -100 || x > width + 100 ||
-            y < -100 || y > height + 100
-        ) {
+        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
             el.style.display = 'none';
             return;
         }
@@ -452,7 +450,9 @@
         el.style.top = y + 'px';
     });
 }
-    function animate() {
+
+// دالة التحريك
+function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene3D, camera);
@@ -460,7 +460,7 @@
 }
 
 // استدعاء أولي للأنيميشن
-animate();                
+animate();               
     </script>
 </body>
 </html> 
