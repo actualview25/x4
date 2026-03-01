@@ -216,46 +216,45 @@
                 item.addEventListener('click', () => loadScene(index));
                 container.appendChild(item);
             });
+        }function createHotspotElement(x, y, type, data) {
+    type = type.toUpperCase(); // توحيد نوع النقطة
+
+    const div = document.createElement('div');
+    div.className = 'hotspot-marker';
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+    div.style.cursor = 'pointer';
+    div.style.zIndex = '1000';
+
+    const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
+    const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
+    const displayText = type === 'SCENE'
+        ? (data.targetSceneName || 'انتقال')
+        : (data.title || 'معلومات');
+
+    div.innerHTML =
+        '<img src="' + iconUrl + '" alt="' + type + '" ' +
+        'style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); pointer-events: none;">' +
+        '<div class="hotspot-label" style="border-color: ' + borderColor + ';">' +
+        displayText +
+        '</div>';
+
+    div.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+        if (type === 'INFO') {
+            showInfoWindow(data.title, data.content);
+        } else {
+            const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+            if (targetIndex !== -1) {
+                setTimeout(() => loadScene(targetIndex), 300);
+            }
         }
-        function createHotspotElement(x, y, type, data) {
-    type = type.toUpperCase(); // ✅
-   
+    });
+
+    return div; // ✅ الآن داخل الدالة
 }
-            const div = document.createElement('div');
-            div.className = 'hotspot-marker';
-            div.style.left = x + 'px';
-            div.style.top = y + 'px';
-            div.style.cursor = 'pointer';
-            div.style.zIndex = '1000';
-            
-            const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
-            const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-            const displayText = type === 'SCENE' 
-                ? (data.targetSceneName || 'انتقال') 
-                : (data.title || 'معلومات');
-            
-            div.innerHTML = '<img src="' + iconUrl + '" alt="' + type + '" style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); cursor: pointer; pointer-events: none;">' +
-                '<div class="hotspot-label" style="border-color: ' + borderColor + ';">' + displayText + '</div>';
-            
-            div.addEventListener('click', function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                if (type === 'INFO') {
-                    showInfoWindow(data.title, data.content);
-                } else {
-                    const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-                    if (targetIndex !== -1) {
-                        setTimeout(() => loadScene(targetIndex), 300);
-                    }
-                }
-            });
-            
-            div.style.cursor = 'pointer';
-            
-            return div;
-        }
-        
         function showInfoWindow(title, content) {
             document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
             
