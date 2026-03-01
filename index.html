@@ -380,87 +380,87 @@
         updateSceneList(); // تحديث القائمة
     }); // نهاية TextureLoader.load
 } // نهاية loadScene
-        
         fetch('tour-data.json')
-            .then(res => res.json())
-            .then(data => {
-                scenes = data;
-                
-                scene3D = new THREE.Scene();
-                scene3D.background = new THREE.Color(0x000000);
-                
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(0, 0, 0.1);
-                
-                renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                document.getElementById('container').appendChild(renderer.domElement);
-                
-                scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
-                
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableZoom = true;
-                controls.enablePan = false;
-                controls.enableDamping = true;
-                controls.autoRotate = autoRotate;
-                controls.autoRotateSpeed = 0.5;
-                
-                document.getElementById('autoRotateBtn').onclick = function() {
-                    autoRotate = !autoRotate;
-                    controls.autoRotate = autoRotate;
-                    document.getElementById('autoRotateBtn').textContent = 
-                        autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
-                };
-                
-                createPathsTogglePanel();
-                initScenePanel();
-                loadScene(0);
-                
-                window.addEventListener('resize', function() {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    rebuildHotspots();
-                });
-              // تحديث مواقع الهوتسبوت
-function updateHotspotsPosition() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+  .then(res => res.json())
+  .then(data => {
+      scenes = data;
+      
+      scene3D = new THREE.Scene();
+      scene3D.background = new THREE.Color(0x000000);
+      
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 0, 0.1);
+      
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.getElementById('container').appendChild(renderer.domElement);
+      
+      scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
+      
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = true;
+      controls.enablePan = false;
+      controls.enableDamping = true;
+      controls.autoRotate = autoRotate;
+      controls.autoRotateSpeed = 0.5;
+      
+      // إزالة أي عناصر قديمة قبل تحميل المشهد الجديد
+      if (sphereMesh) scene3D.remove(sphereMesh);
+      document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+      allPaths.forEach(p => scene3D.remove(p));
+      allPaths = [];
+      
+      createPathsTogglePanel();
+      initScenePanel();
+      loadScene(0);  // هنا يتم تحميل المشهد
+      
+      // حدث تغيير حجم النافذة
+      window.addEventListener('resize', function() {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          rebuildHotspots();
+      });
+      
+      // دالة تحديث مواقع الهوتسبوت
+      function updateHotspotsPosition() {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
 
-    Object.values(hotspotMarkers).forEach(el => {
-        if (!el._worldPosition) return;
+          Object.values(hotspotMarkers).forEach(el => {
+              if (!el._worldPosition) return;
 
-        const projected = el._worldPosition.clone().project(camera);
+              const projected = el._worldPosition.clone().project(camera);
 
-        if (projected.z > 1) {
-            el.style.display = 'none';
-            return;
-        }
+              if (projected.z > 1) {
+                  el.style.display = 'none';
+                  return;
+              }
 
-        const x = (projected.x * 0.5 + 0.5) * width;
-        const y = (-projected.y * 0.5 + 0.5) * height;
+              const x = (projected.x * 0.5 + 0.5) * width;
+              const y = (-projected.y * 0.5 + 0.5) * height;
 
-        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-            el.style.display = 'none';
-            return;
-        }
+              if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+                  el.style.display = 'none';
+                  return;
+              }
 
-        el.style.display = 'block';
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-    });
-}
+              el.style.display = 'block';
+              el.style.left = x + 'px';
+              el.style.top = y + 'px';
+          });
+      }
 
-// دالة التحريك
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene3D, camera);
-    updateHotspotsPosition();
-}
+      // دالة التحريك
+      function animate() {
+          requestAnimationFrame(animate);
+          controls.update();
+          renderer.render(scene3D, camera);
+          updateHotspotsPosition();
+      }
 
-// استدعاء أولي للأنيميشن
-animate();               
+      animate(); // بدء الأنيميشن
+  });              
     </script>
 </body>
 </html> 
