@@ -325,7 +325,7 @@
     currentSceneIndex = index;
 
     if (sphereMesh) scene3D.remove(sphereMesh);
-    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+    
     allPaths.forEach(p => scene3D.remove(p));
     allPaths = [];
 
@@ -452,20 +452,12 @@
         el.style.top = y + 'px';
     });
 }
-                function animate() {
-                    requestAnimationFrame(animate);
-                    controls.update();
-                    renderer.render(scene3D, camera);
-                    function animate() {
+                functiofunction animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene3D, camera);
-    updateHotspotsPosition(); // ✅ سنضعها بدلًا منه
+    updateHotspotsPosition();
 }
-                }
-                animate();
-            })
-            .catch(err => console.error('خطأ في تحميل البيانات:', err));
     </script>
 </body>
 </html> 
