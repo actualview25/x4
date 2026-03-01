@@ -239,51 +239,22 @@
         displayText +
         '</div>';
 
-    div.addEventListener('click', function(e) {
-    e.stopPropagation();
-    e.preventDefault();
+    div.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
 
-    if (type === 'INFO') {
-
-        // إغلاق أي نافذة info أخرى
-        document.querySelectorAll('.info-popup').forEach(p => p.remove());
-
-        // Toggle: إذا كانت مفتوحة، أغلقها
-        if (div._infoPopup) {
-            div._infoPopup.remove();
-            div._infoPopup = null;
-            return;
+        if (type === 'INFO') {
+            showInfoWindow(data.title, data.content);
+        } else {
+            const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+            if (targetIndex !== -1) {
+                setTimeout(() => loadScene(targetIndex), 300);
+            }
         }
+    });
 
-        const popup = document.createElement('div');
-        popup.className = 'info-popup';
-
-        popup.innerHTML = `
-            <h4>${data.title || 'معلومات'}</h4>
-            <div class="content">${data.content || ''}</div>
-        `;
-
-        document.body.appendChild(popup);
-        popup.style.display = 'block';
-
-        div._infoPopup = popup;
-
-        // إغلاق عند النقر خارجها
-        setTimeout(() => {
-            document.addEventListener('click', function closeOnce(ev) {
-                if (!popup.contains(ev.target) && ev.target !== div) {
-                    popup.remove();
-                    div._infoPopup = null;
-                    document.removeEventListener('click', closeOnce);
-                }
-            });
-        }, 0);
-
-    } else {
-        const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
-        if (targetIndex !== -1) loadScene(targetIndex);
-    }
-});
+    return div; // ✅ الآن داخل الدالة
+}
         function showInfoWindow(title, content) {
             document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
             
@@ -463,44 +434,44 @@
       });
       
       // دالة تحديث مواقع الهوتسبوت
-     function updateHotspotsPosition() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
+      function updateHotspotsPosition() {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
 
-    Object.values(hotspotMarkers).forEach(el => {
-        if (!el._worldPosition) return;
+          Object.values(hotspotMarkers).forEach(el => {
+              if (!el._worldPosition) return;
 
-        const projected = el._worldPosition.clone().project(camera);
+              const projected = el._worldPosition.clone().project(camera);
 
-        if (projected.z > 1) {
-            el.style.display = 'none';
-            return;
-        }
+              if (projected.z > 1) {
+                  el.style.display = 'none';
+                  return;
+              }
 
-        const x = (projected.x * 0.5 + 0.5) * width;
-        const y = (-projected.y * 0.5 + 0.5) * height;
+              const x = (projected.x * 0.5 + 0.5) * width;
+              const y = (-projected.y * 0.5 + 0.5) * height;
 
-        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-            el.style.display = 'none';
-            return;
-        }
+              if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+                  el.style.display = 'none';
+                  return;
+              }
 
-        el.style.display = 'block';
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-    });
-}
+              el.style.display = 'block';
+              el.style.left = x + 'px';
+              el.style.top = y + 'px';
+          });
+      }
 
-// دالة التحريك (واحدة فقط)
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene3D, camera);
-    updateHotspotsPosition();
-}
+      // دالة التحريك
+      function animate() {
+          requestAnimationFrame(animate);
+          controls.update();
+          renderer.render(scene3D, camera);
+          updateHotspotsPosition();
+      }
 
-// بدء الأنيميشن
-animate();
+      animate(); // بدء الأنيميشن
+  });              
     </script>
 </body>
 </html> 
