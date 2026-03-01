@@ -273,33 +273,44 @@
             setTimeout(() => win.remove(), 5000);
         }
         
-        function rebuildHotspots() {
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-            hotspotMarkers = {};
-            
-            const currentScene = scenes[currentSceneIndex];
-            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
-            
-            const width = window.innerWidth, height = window.innerHeight;
-            
-            currentScene.hotspots.forEach(h => {
-                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-                const projected = pos.clone().project(camera);
-                
-                if (projected.z > 1) return;
-                
-                const x = (projected.x * 0.5 + 0.5) * width;
-                const y = (-projected.y * 0.5 + 0.5) * height;
-                
-                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
-                
-                const iconElement = createHotspotElement(x, y, h.type, h.data);
-                iconElement._worldPosition = pos.clone();
-                iconElement.dataset.id = h.id;
-                document.body.appendChild(iconElement);
-                hotspotMarkers[h.id] = iconElement;
-            });
+     function rebuildHotspots() {
+    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+    hotspotMarkers = {};
+    
+    const currentScene = scenes[currentSceneIndex];
+    if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
+    
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    currentScene.hotspots.forEach(h => {
+        const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+        const projected = pos.clone().project(camera);
+        
+        // ❌ لا نمنع الإنشاء
+        const hiddenByZ = projected.z > 1;
+        
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
+        
+        const outOfView =
+            x < -100 || x > width + 100 ||
+            y < -100 || y > height + 100;
+        
+        // ✅ ننشئ الهوتسبوت دائمًا
+        const iconElement = createHotspotElement(x, y, h.type, h.data);
+        iconElement._worldPosition = pos.clone();
+        iconElement.dataset.id = h.id;
+        
+        // ✅ نخفيه فقط إن كان خارج الرؤية
+        if (hiddenByZ || outOfView) {
+            iconElement.style.display = 'none';
         }
+        
+        document.body.appendChild(iconElement);
+        hotspotMarkers[h.id] = iconElement;
+    });
+}
         
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
