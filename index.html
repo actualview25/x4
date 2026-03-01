@@ -217,8 +217,10 @@
                 container.appendChild(item);
             });
         }
-        function createHotspotElement(x, y, type, data) {  type = type.toUpperCase(); // ✅
-        }
+        function createHotspotElement(x, y, type, data) {
+    type = type.toUpperCase(); // ✅
+    ...
+}
             const div = document.createElement('div');
             div.className = 'hotspot-marker';
             div.style.left = x + 'px';
