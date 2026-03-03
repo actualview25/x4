@@ -463,55 +463,60 @@ function createHotspotElement(type, data) {
             
             setTimeout(() => win.remove(), 5000);
         }
-function rebuildHotspots() {
-    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-    hotspotMarkers = {};
 
-    const currentScene = scenes[currentSceneIndex];
-    if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
-
-    currentScene.hotspots.forEach(h => {
-        const iconElement = createHotspotElement(0, 0, h.type, h.data);
-
-        // ✅ نخزن الزوايا فقط (من الأداة الأساسية)
-        iconElement._yaw   = h.yaw;    // من -Math.PI إلى +Math.PI
-        iconElement._pitch = h.pitch;  // من -Math.PI/2 إلى +Math.PI/2
-
-        iconElement.dataset.id = h.id;
-
-        document.body.appendChild(iconElement);
-        hotspotMarkers[h.id] = iconElement;
-    });
-}
-        function updateHotspotsPosition() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    Object.values(hotspotMarkers).forEach(el => {
-        if (el._yaw === undefined || el._pitch === undefined) return;
-
-        const radius = 500;
-
-        const x = radius * Math.cos(el._pitch) * Math.sin(el._yaw);
-        const y = radius * Math.sin(el._pitch);
-        const z = radius * Math.cos(el._pitch) * Math.cos(el._yaw);
-
-        const worldPos = new THREE.Vector3(x, y, z);
-        const projected = worldPos.project(camera);
-
-        if (projected.z < 0 || projected.z > 1) {
-            el.style.display = 'none';
-            return;
+        function rebuildHotspots() {
+            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+            hotspotMarkers = {};
+            
+            const currentScene = scenes[currentSceneIndex];
+            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            currentScene.hotspots.forEach(h => {
+                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+                const projected = pos.clone().project(camera);
+                
+                const x = (projected.x * 0.5 + 0.5) * width;
+                const y = (-projected.y * 0.5 + 0.5) * height;
+                
+                const iconElement = createHotspotElement(x, y, h.type, h.data);
+                iconElement._worldPosition = pos.clone();
+                iconElement.dataset.id = h.id;
+                
+                document.body.appendChild(iconElement);
+                hotspotMarkers[h.id] = iconElement;
+            });
         }
 
-        const screenX = (projected.x * 0.5 + 0.5) * width;
-        const screenY = (-projected.y * 0.5 + 0.5) * height;
+        function updateHotspotsPosition() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
 
-        el.style.display = 'block';
-        el.style.left = screenX + 'px';
-        el.style.top = screenY + 'px';
-    });
-}
+            Object.values(hotspotMarkers).forEach(el => {
+                if (!el._worldPosition) return;
+
+                const projected = el._worldPosition.clone().project(camera);
+
+                if (projected.z > 1) {
+                    el.style.display = 'none';
+                    return;
+                }
+
+                const x = (projected.x * 0.5 + 0.5) * width;
+                const y = (-projected.y * 0.5 + 0.5) * height;
+
+                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+                    el.style.display = 'none';
+                    return;
+                }
+
+                el.style.display = 'block';
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            });
+        }
               // ===== دوال المسارات =====
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
