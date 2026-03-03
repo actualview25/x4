@@ -395,42 +395,54 @@
             });
         }
 // ===== دوال Hotspots =====
-function createHotspotElement(x, y, type, data) {
+function createHotspotElement(type, data) {
+    type = type.toUpperCase();
+
     const div = document.createElement('div');
     div.className = 'hotspot-marker';
-    div.style.left = x + 'px';
-    div.style.top = y + 'px';
+    div.style.position = 'absolute';
     div.style.cursor = 'pointer';
     div.style.zIndex = '1000';
-    div.style.pointerEvents = 'auto'; // 👈 1. الحاوية تستقبل النقر
-    
+    div.style.display = 'none'; // ← سيظهر فقط عند التحديث الصحيح
+    div.style.transform = 'translate(-50%, -50%)';
+
     const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
     const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-    const displayText = type === 'SCENE' 
-        ? (data.targetSceneName || 'انتقال') 
+    const labelText = type === 'SCENE'
+        ? (data.targetSceneName || 'انتقال')
         : (data.title || 'معلومات');
-    
-    // 👈 2. أضف pointer-events: none للعناصر الداخلية
-    div.innerHTML = '<img src="' + iconUrl + '" alt="' + type + '" ' +
-        'style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); pointer-events: none;">' +
-        '<div class="hotspot-label" style="border-color: ' + borderColor + '; pointer-events: none;">' + 
-        displayText + 
-        '</div>';
-    
-    div.addEventListener('click', function(e) {
+
+    div.innerHTML = `
+        <img src="${iconUrl}" 
+             style="
+                width:40px;
+                height:40px;
+                border-radius:50%;
+                border:2px solid ${borderColor};
+                background:rgba(0,0,0,0.35);
+                pointer-events:none;
+             ">
+        <div class="hotspot-label" style="border-color:${borderColor};">
+            ${labelText}
+        </div>
+    `;
+
+    div.addEventListener('click', function (e) {
         e.stopPropagation();
         e.preventDefault();
-        
+
         if (type === 'INFO') {
             showInfoWindow(data.title, data.content);
-        } else {
-            const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+        } else if (type === 'SCENE') {
+            const targetIndex = scenes.findIndex(
+                s => s.id === data.targetSceneId
+            );
             if (targetIndex !== -1) {
-                setTimeout(() => loadScene(targetIndex), 300);
+                loadScene(targetIndex);
             }
         }
     });
-    
+
     return div;
 }
         
