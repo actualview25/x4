@@ -597,87 +597,84 @@ function rebuildHotspots() {
             });
         }
         
-        // ===== التهيئة =====
-        fetch('tour-data.json')
-            .then(res => res.json())
-            .then(data => {
-                scenes = data;
-                
-                scene3D = new THREE.Scene();
-                scene3D.background = new THREE.Color(0x000000);
-                
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.set(0, 0, 0.1);
-                
-                renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                document.getElementById('container').appendChild(renderer.domElement);
-                
-                scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
-                
-                controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableZoom = true;
-                controls.enablePan = false;
-                controls.enableDamping = true;
-                controls.autoRotate = autoRotate;
-                controls.autoRotateSpeed = 0.5;
-                
-                document.getElementById('autoRotateBtn').onclick = function() {
-                    autoRotate = !autoRotate;
-                    controls.autoRotate = autoRotate;
-                    document.getElementById('autoRotateBtn').textContent = 
-                        autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
-                };
-                
-                document.getElementById('toggleMeasurements').addEventListener('click', function() {
-                    showMeasurements = !showMeasurements;
-                    this.textContent = showMeasurements ? '📏 إخفاء القياسات' : '📏 إظهار القياسات';
-                    this.classList.toggle('active');
-                    
-                    measurementElements.forEach(elem => {
-                        if (elem.line) elem.line.style.display = showMeasurements ? 'block' : 'none';
-                        if (elem.start) elem.start.style.display = showMeasurements ? 'block' : 'none';
-                        if (elem.end) elem.end.style.display = showMeasurements ? 'block' : 'none';
-                        if (elem.label) elem.label.style.display = showMeasurements ? 'block' : 'none';
-                    });
-                });
-                
-                createPathsTogglePanel();
-                initScenePanel();
-                loadScene(0);
-                
-              window.addEventListener('resize', function() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    rebuildHotspots();
-});
+        // ===== التهيئة =====// ===== التهيئة =====
+fetch('tour-data.json')
+    .then(res => res.json())
+    .then(data => {
+        scenes = data;
+        
+        scene3D = new THREE.Scene();
+        scene3D.background = new THREE.Color(0x000000);
+        
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 0.1);
+        
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('container').appendChild(renderer.domElement);
+        
+        scene3D.add(new THREE.AmbientLight(0xffffff, 1.5));
+        
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableZoom = true;
+        controls.enablePan = false;
+        controls.enableDamping = true;
+        controls.autoRotate = autoRotate;
+        controls.autoRotateSpeed = 0.5;
+        
+        document.getElementById('autoRotateBtn').onclick = function() {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+            document.getElementById('autoRotateBtn').textContent = 
+                autoRotate ? '⏸️ إيقاف الدوران' : '▶️ تشغيل الدوران';
+        };
+        
+        document.getElementById('toggleMeasurements').addEventListener('click', function() {
+            showMeasurements = !showMeasurements;
+            this.textContent = showMeasurements ? '📏 إخفاء القياسات' : '📏 إظهار القياسات';
+            this.classList.toggle('active');
+            
+            measurementElements.forEach(elem => {
+                if (elem.line) elem.line.style.display = showMeasurements ? 'block' : 'none';
+                if (elem.start) elem.start.style.display = showMeasurements ? 'block' : 'none';
+                if (elem.end) elem.end.style.display = showMeasurements ? 'block' : 'none';
+                if (elem.label) elem.label.style.display = showMeasurements ? 'block' : 'none';
+            });
+        });
+        
+        createPathsTogglePanel();
+        initScenePanel();
+        loadScene(0);
+        
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            rebuildHotspots();
+        });
+        
+        // 👇 دالة animate
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene3D, camera);
+            
+            if (typeof updateMeasurementPositions === 'function') {
+                updateMeasurementPositions();
+            }
+        }
+        animate();
 
-// ✅ دالة animate الصحيحة
-// دالة التحريك (تحدث الرندر فقط)
-function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene3D, camera);
-    
-    // تحديث القياسات (يمكن أن تكون ثقيلة)
-    if (typeof updateMeasurementPositions === 'function') {
-        updateMeasurementPositions();
-    }
-}
-animate();
+        // 👇 حدث تغير الكاميرا
+        controls.addEventListener('change', function() {
+            if (typeof updateHotspotsPosition === 'function') {
+                updateHotspotsPosition();
+            }
+        });
 
-// حدث تغير الكاميرا (للمسارات والنقاط)
-controls.addEventListener('change', function() {
-    // تحديث النقاط
-    if (typeof updateHotspotsPosition === 'function') {
-        updateHotspotsPosition();
-    }
-    
-    // تحديث المسارات إذا لزم الأمر
-    // يمكن إضافة دوال أخرى هنا
-});
-            catch(err => console.error('خطأ في تحميل البيانات:', err));
+    }) // 👈 هذا القوس يغلق then
+    .catch(err => console.error('خطأ في تحميل البيانات:', err)); // 👈 الكاتش هنا صح
+</script>
     </script>
 </body>
 </html>
