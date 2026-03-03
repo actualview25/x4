@@ -453,6 +453,7 @@ function createHotspotElement(x, y, type, data) {
             setTimeout(() => win.remove(), 5000);
         }
 function rebuildHotspots() {
+    // إزالة النقاط القديمة
     document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
     hotspotMarkers = {};
     
@@ -464,55 +465,55 @@ function rebuildHotspots() {
     
     currentScene.hotspots.forEach(h => {
         const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-        const projected = pos.clone().project(camera); // 👈 استخدم clone
+        const projected = pos.clone().project(camera);
         
-        // ✅ لا نمنع الإنشاء، نخفي فقط
-        const hiddenByZ = projected.z > 1;
+        // ✅ النقاط خلف الكاميرا لا تظهر
+        if (projected.z > 1) return;
         
         const x = (projected.x * 0.5 + 0.5) * width;
         const y = (-projected.y * 0.5 + 0.5) * height;
         
-        // ✅ ننشئ الهوتسبوت دائمًا
-        const iconElement = createHotspotElement(x, y, h.type, h.data);
-        iconElement._worldPosition = pos.clone(); // 👈 استخدم pos الأصلي
-        iconElement.dataset.id = h.id;
+        // ✅ خارج حدود الشاشة لا تظهر
+        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
         
-        // ✅ نخفيه فقط إن كان خارج الرؤية
-        if (hiddenByZ || x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-            iconElement.style.display = 'none';
-        }
+        const iconElement = createHotspotElement(x, y, h.type, h.data);
+        iconElement._worldPosition = pos.clone();
+        iconElement.dataset.id = h.id;
         
         document.body.appendChild(iconElement);
         hotspotMarkers[h.id] = iconElement;
     });
 }
         function updateHotspotsPosition() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-            Object.values(hotspotMarkers).forEach(el => {
-                if (!el._worldPosition) return;
+    Object.values(hotspotMarkers).forEach(el => {
+        if (!el._worldPosition) return;
 
-                const projected = el._worldPosition.clone().project(camera);
+        const projected = el._worldPosition.clone().project(camera);
 
-                if (projected.z > 1) {
-                    el.style.display = 'none';
-                    return;
-                }
-
-                const x = (projected.x * 0.5 + 0.5) * width;
-                const y = (-projected.y * 0.5 + 0.5) * height;
-
-                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-                    el.style.display = 'none';
-                    return;
-                }
-
-                el.style.display = 'block';
-                el.style.left = x + 'px';
-                el.style.top = y + 'px';
-            });
+        // إخفاء النقاط خلف الكاميرا
+        if (projected.z > 1) {
+            el.style.display = 'none';
+            return;
         }
+
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
+
+        // إخفاء النقاط خارج الشاشة
+        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+            el.style.display = 'none';
+            return;
+        }
+
+        // إظهار وتحديث الموقع
+        el.style.display = 'block';
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+    });
+}
               // ===== دوال المسارات =====
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
