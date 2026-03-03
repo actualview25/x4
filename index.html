@@ -82,13 +82,21 @@
         .scene-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .scene-hotspot-count { font-size: 11px; background: rgba(74, 108, 143, 0.4); padding: 2px 6px; border-radius: 12px; color: #88aaff; }
         
-        .paths-control-panel {
-            position: fixed; top: 20px; right: 20px;
-            background: rgba(20, 30, 40, 0.85); backdrop-filter: blur(10px);
-            border: 2px solid #4a6c8f; border-radius: 15px; color: white;
-            z-index: 200; padding: 15px; min-width: 200px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); direction: rtl;
-        }
+        ..paths-control-panel {
+    position: fixed;
+    top: 80px; /* من 20px إلى 80px */
+    right: 20px;
+    background: rgba(20, 30, 40, 0.25);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(74, 108, 143, 0.3);
+    border-radius: 12px;
+    color: white;
+    z-index: 900;
+    padding: 15px;
+    min-width: 200px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    direction: rtl;
+}
         .paths-control-panel h3 { margin: 0 0 10px 0; color: #88aaff; font-size: 16px; text-align: center; border-bottom: 1px solid #4a6c8f; padding-bottom: 8px; }
         .path-toggle-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .path-toggle-item:last-child { border-bottom: none; }
@@ -176,14 +184,116 @@
                 transform: translateY(-50%); color: #88aaff; font-size: 24px;
                 opacity: 0.5; pointer-events: none;
             }
-            .paths-control-panel { top: 10px; right: 10px; padding: 10px; min-width: 150px; }
-            .paths-control-panel h3 { font-size: 14px; }
-            .path-toggle-item label { font-size: 12px; }
-            .custom-info-window { width: 90%; padding: 15px 20px; bottom: 20px; }
-            .hotspot-marker img { width: 35px; height: 35px; }
-            #autoRotateBtn { font-size: 14px; padding: 10px 20px; }
-            #toggleMeasurements { bottom: 70px; right: 10px; padding: 8px 16px; font-size: 12px; }
-        }
+            @media (max-width: 768px) {
+    /* ... الكود الموجود ... */
+    
+    /* زر إظهار/إخفاء المسارات للهاتف */
+    .paths-toggle-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(74, 108, 143, 0.8);
+        border: 2px solid #88aaff;
+        color: white;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 300;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    
+    /* لوحة المسارات مخفية افتراضياً في الهاتف */
+    .paths-control-panel {
+        position: fixed;
+        top: auto;
+        bottom: 140px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: none;
+        display: none; /* مخفية افتراضياً */
+        z-index: 350;
+    }
+    
+    /* عند إظهارها */
+    .paths-control-panel.show {
+        display: block;
+    }
+}
+  /* ===== شريط الأدوات العلوي ===== */
+.toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(20, 30, 40, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(74, 108, 143, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(136, 170, 255, 0.5);
+}
+
+.tour-name {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.1);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(74,108,143,0.3);
+}
+
+/* ===== تحسين الشفافية للنوافذ ===== */
+.paths-control-panel,
+.scene-list-panel {
+    background: rgba(20, 30, 40, 0.25) !important; /* نفس شفافية الأداة */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(74, 108, 143, 0.3) !important;
+}
+
+/* ===== تحسين رؤوس النوافذ ===== */
+.paths-control-panel h3,
+.scene-list-panel .panel-header h3 {
+    color: white !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+}
+
+/* ===== أزرار التحكم ===== */
+#autoRotateBtn,
+#toggleMeasurements {
+    background: rgba(20, 30, 40, 0.4) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(74, 108, 143, 0.3) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+}
+
+#autoRotateBtn:hover,
+#toggleMeasurements:hover {
+    background: rgba(74, 108, 143, 0.6) !important;
+    transform: translateX(-50%) scale(1.05) !important;
+}          
     </style>
 </head>
 <body>
@@ -678,8 +788,30 @@ fetch('tour-data.json')
         });
 
     }) // 👈 هذا القوس يغلق then
-    .catch(err => console.error('خطأ في تحميل البيانات:', err)); // 👈 الكاتش هنا صح
+    .catch(err => console.error('خطأ في تحميل البيانات:', err)); // 👈 
+    // التحكم بإظهار/إخفاء المسارات في الهاتف
+const pathsToggleBtn = document.getElementById('pathsToggleBtn');
+const pathsPanel = document.querySelector('.paths-control-panel');
+
+if (pathsToggleBtn && pathsPanel) {
+    pathsToggleBtn.addEventListener('click', function() {
+        pathsPanel.classList.toggle('show');
+        this.textContent = pathsPanel.classList.contains('show') ? '✕' : '🔘';
+    });
+    
+    // إخفاء عند النقر خارجها
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+            if (!pathsPanel.contains(e.target) && e.target !== pathsToggleBtn) {
+                pathsPanel.classList.remove('show');
+                pathsToggleBtn.textContent = '🔘';
+            }
+        }
+    });
+}
 </script>
     </script>
+    <!-- زر إظهار/إخفاء المسارات للهاتف -->
+<button class="paths-toggle-btn" id="pathsToggleBtn">🔘</button>
 </body>
 </html>
