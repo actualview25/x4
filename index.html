@@ -479,33 +479,34 @@ function createHotspotElement(x, y, type, data) {
         }
 
         function updateHotspotsPosition() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
 
-            Object.values(hotspotMarkers).forEach(el => {
-                if (!el._worldPosition) return;
+    Object.values(hotspotMarkers).forEach(el => {
+        if (el._yaw === undefined || el._pitch === undefined) return;
 
-                const projected = el._worldPosition.clone().project(camera);
+        const radius = 500;
 
-                if (projected.z > 1) {
-                    el.style.display = 'none';
-                    return;
-                }
+        const x = radius * Math.cos(el._pitch) * Math.sin(el._yaw);
+        const y = radius * Math.sin(el._pitch);
+        const z = radius * Math.cos(el._pitch) * Math.cos(el._yaw);
 
-                const x = (projected.x * 0.5 + 0.5) * width;
-                const y = (-projected.y * 0.5 + 0.5) * height;
+        const worldPos = new THREE.Vector3(x, y, z);
+        const projected = worldPos.project(camera);
 
-                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-                    el.style.display = 'none';
-                    return;
-                }
-
-                el.style.display = 'block';
-                el.style.left = x + 'px';
-                el.style.top = y + 'px';
-            });
+        if (projected.z < 0 || projected.z > 1) {
+            el.style.display = 'none';
+            return;
         }
 
+        const screenX = (projected.x * 0.5 + 0.5) * width;
+        const screenY = (-projected.y * 0.5 + 0.5) * height;
+
+        el.style.display = 'block';
+        el.style.left = screenX + 'px';
+        el.style.top = screenY + 'px';
+    });
+}
               // ===== دوال المسارات =====
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
