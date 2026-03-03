@@ -654,13 +654,14 @@ function rebuildHotspots() {
                     rebuildHotspots();
                 });
                 
-                function animate() {
-                    requestAnimationFrame(animate);
-                    controls.update();
-                    renderer.render(scene3D, camera);
-                    
-                    updateMeasurementPositions();
-                }
+                ffunction animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene3D, camera);
+    // rebuildHotspots(); // 👈 هذا السطر محذوف (وهذا صحيح!)
+    updateHotspotsPosition(); // 👈 هذا موجود
+    updateMeasurementPositions();
+}
                 animate();
             })
             .catch(err => console.error('خطأ في تحميل البيانات:', err));
