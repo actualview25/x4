@@ -654,23 +654,29 @@ function rebuildHotspots() {
 });
 
 // ✅ دالة animate الصحيحة
+// دالة التحريك (تحدث الرندر فقط)
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene3D, camera);
     
-    // تحديث مواقع النقاط
-    if (typeof updateHotspotsPosition === 'function') {
-        updateHotspotsPosition();
-    }
-    
-    // تحديث مواقع القياسات
+    // تحديث القياسات (يمكن أن تكون ثقيلة)
     if (typeof updateMeasurementPositions === 'function') {
         updateMeasurementPositions();
     }
 }
-animate(); // بدء التشغيل
-            })
+animate();
+
+// حدث تغير الكاميرا (للمسارات والنقاط)
+controls.addEventListener('change', function() {
+    // تحديث النقاط
+    if (typeof updateHotspotsPosition === 'function') {
+        updateHotspotsPosition();
+    }
+    
+    // تحديث المسارات إذا لزم الأمر
+    // يمكن إضافة دوال أخرى هنا
+});
             .catch(err => console.error('خطأ في تحميل البيانات:', err));
     </script>
 </body>
