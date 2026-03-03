@@ -396,54 +396,36 @@
         }
 // ===== دوال Hotspots =====
 function createHotspotElement(type, data) {
-    type = type.toUpperCase();
+    // التأكد من أن type نصي
+    if (!type || typeof type !== 'string') {
+        console.warn('⚠️ نوع الهوتسبوت غير صحيح:', type, data);
+        type = 'INFO'; // تعيين نوع افتراضي لتجنب الأخطاء
+    }
 
-    const div = document.createElement('div');
-    div.className = 'hotspot-marker';
-    div.style.position = 'absolute';
-    div.style.cursor = 'pointer';
-    div.style.zIndex = '1000';
-    div.style.display = 'none'; // ← سيظهر فقط عند التحديث الصحيح
-    div.style.transform = 'translate(-50%, -50%)';
+    const upperType = type.toUpperCase();
 
-    const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
-    const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-    const labelText = type === 'SCENE'
-        ? (data.targetSceneName || 'انتقال')
-        : (data.title || 'معلومات');
+    const el = document.createElement('div');
+    el.className = 'hotspot-element';
+    el.dataset.type = upperType;
 
-    div.innerHTML = `
-        <img src="${iconUrl}" 
-             style="
-                width:40px;
-                height:40px;
-                border-radius:50%;
-                border:2px solid ${borderColor};
-                background:rgba(0,0,0,0.35);
-                pointer-events:none;
-             ">
-        <div class="hotspot-label" style="border-color:${borderColor};">
-            ${labelText}
-        </div>
-    `;
+    if (upperType === 'INFO') {
+        el.innerHTML = `<span class="hotspot-icon">🛈</span>`;
+        el.title = data?.title || 'معلومة';
+    } else if (upperType === 'SCENE') {
+        el.innerHTML = `<span class="hotspot-icon">🚪</span>`;
+        el.title = data?.description || data?.targetSceneName || 'انتقال لمشهد';
+    } else {
+        // نوع غير معروف
+        el.innerHTML = `<span class="hotspot-icon">❓</span>`;
+        el.title = data?.title || 'هوتسبوت غير معروف';
+        console.warn('⚠️ تم إنشاء هوتسبوت بنوع غير معروف:', type);
+    }
 
-    div.addEventListener('click', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
+    // إضافة بيانات إضافية
+    el.dataset.id = data?.id || '';
+    el.dataset.info = JSON.stringify(data || {});
 
-        if (type === 'INFO') {
-            showInfoWindow(data.title, data.content);
-        } else if (type === 'SCENE') {
-            const targetIndex = scenes.findIndex(
-                s => s.id === data.targetSceneId
-            );
-            if (targetIndex !== -1) {
-                loadScene(targetIndex);
-            }
-        }
-    });
-
-    return div;
+    return el;
 }
         
         function showInfoWindow(title, content) {
