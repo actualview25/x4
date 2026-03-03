@@ -647,22 +647,30 @@ function rebuildHotspots() {
                 initScenePanel();
                 loadScene(0);
                 
-                window.addEventListener('resize', function() {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    rebuildHotspots();
-                });
-                
-                ffunction animate() {
+              window.addEventListener('resize', function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    rebuildHotspots();
+});
+
+// ✅ دالة animate الصحيحة
+function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene3D, camera);
-    // rebuildHotspots(); // 👈 هذا السطر محذوف (وهذا صحيح!)
-    updateHotspotsPosition(); // 👈 هذا موجود
-    updateMeasurementPositions();
+    
+    // تحديث مواقع النقاط
+    if (typeof updateHotspotsPosition === 'function') {
+        updateHotspotsPosition();
+    }
+    
+    // تحديث مواقع القياسات
+    if (typeof updateMeasurementPositions === 'function') {
+        updateMeasurementPositions();
+    }
 }
-                animate();
+animate(); // بدء التشغيل
             })
             .catch(err => console.error('خطأ في تحميل البيانات:', err));
     </script>
