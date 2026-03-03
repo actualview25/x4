@@ -451,34 +451,26 @@ function createHotspotElement(x, y, type, data) {
             
             setTimeout(() => win.remove(), 5000);
         }
+function rebuildHotspots() {
+    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+    hotspotMarkers = {};
 
-        function rebuildHotspots() {
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-            hotspotMarkers = {};
-            
-            const currentScene = scenes[currentSceneIndex];
-            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
-            
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            currentScene.hotspots.forEach(h => {
-                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-                const projected = pos.clone().project(camera);
-                
-                const x = (projected.x * 0.5 + 0.5) * width;
-                const y = (-projected.y * 0.5 + 0.5) * height;
-                
-                const iconElement = createHotspotElement(x, y, h.type, h.data);
-               iconElement._yaw = h.yaw;       // من -π إلى +π
-iconElement._pitch = h.pitch;  // من -π/2 إلى +π/2
-                iconElement.dataset.id = h.id;
-                
-                document.body.appendChild(iconElement);
-                hotspotMarkers[h.id] = iconElement;
-            });
-        }
+    const currentScene = scenes[currentSceneIndex];
+    if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
 
+    currentScene.hotspots.forEach(h => {
+        const iconElement = createHotspotElement(0, 0, h.type, h.data);
+
+        // ✅ نخزن الزوايا فقط (من الأداة الأساسية)
+        iconElement._yaw   = h.yaw;    // من -Math.PI إلى +Math.PI
+        iconElement._pitch = h.pitch;  // من -Math.PI/2 إلى +Math.PI/2
+
+        iconElement.dataset.id = h.id;
+
+        document.body.appendChild(iconElement);
+        hotspotMarkers[h.id] = iconElement;
+    });
+}
         function updateHotspotsPosition() {
     const width = window.innerWidth;
     const height = window.innerHeight;
