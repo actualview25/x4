@@ -470,7 +470,8 @@ function createHotspotElement(x, y, type, data) {
                 const y = (-projected.y * 0.5 + 0.5) * height;
                 
                 const iconElement = createHotspotElement(x, y, h.type, h.data);
-                iconElement._worldPosition = pos.clone();
+               iconElement._yaw = h.yaw;       // من -π إلى +π
+iconElement._pitch = h.pitch;  // من -π/2 إلى +π/2
                 iconElement.dataset.id = h.id;
                 
                 document.body.appendChild(iconElement);
