@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>tour-1772497873165 - جولة افتراضية</title>
+    <title>tour-1772503070614 - جولة افتراضية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
@@ -188,7 +188,7 @@
     </style>
 </head>
 <body>
-    <div class="info">🏗️ tour-1772497873165</div>
+    <div class="info">🏗️ tour-1772503070614</div>
     <div id="container"></div>
     <button id="autoRotateBtn">⏸️ إيقاف الدوران</button>
     <button id="toggleMeasurements" class="active">📏 إخفاء القياسات</button>
@@ -394,36 +394,33 @@
                 container.appendChild(item);
             });
         }
-
-        // ===== دوال Hotspots =====
- // ===== دوال Hotspots =====
+// ===== دوال Hotspots =====
 function createHotspotElement(x, y, type, data) {
-    type = type.toUpperCase();
-
     const div = document.createElement('div');
     div.className = 'hotspot-marker';
     div.style.left = x + 'px';
     div.style.top = y + 'px';
     div.style.cursor = 'pointer';
     div.style.zIndex = '1000';
-
+    div.style.pointerEvents = 'auto'; // 👈 1. الحاوية تستقبل النقر
+    
     const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
     const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
-    const displayText = type === 'SCENE'
-        ? (data.targetSceneName || 'انتقال')
+    const displayText = type === 'SCENE' 
+        ? (data.targetSceneName || 'انتقال') 
         : (data.title || 'معلومات');
-
-    div.innerHTML =
-        '<img src="' + iconUrl + '" alt="' + type + '" ' +
+    
+    // 👈 2. أضف pointer-events: none للعناصر الداخلية
+    div.innerHTML = '<img src="' + iconUrl + '" alt="' + type + '" ' +
         'style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); pointer-events: none;">' +
-        '<div class="hotspot-label" style="border-color: ' + borderColor + ';">' +
-        displayText +
+        '<div class="hotspot-label" style="border-color: ' + borderColor + '; pointer-events: none;">' + 
+        displayText + 
         '</div>';
-
-    div.addEventListener('click', function (e) {
+    
+    div.addEventListener('click', function(e) {
         e.stopPropagation();
         e.preventDefault();
-
+        
         if (type === 'INFO') {
             showInfoWindow(data.title, data.content);
         } else {
@@ -433,84 +430,83 @@ function createHotspotElement(x, y, type, data) {
             }
         }
     });
-
+    
     return div;
 }
-
-function showInfoWindow(title, content) {
-    document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
-    
-    const win = document.createElement('div');
-    win.className = 'custom-info-window';
-    win.innerHTML = '<div class="window-header">' +
-        '<img src="' + ICONS.info + '">' +
-        '<h3>' + (title || 'معلومات') + '</h3>' +
-        '</div>' +
-        '<div class="window-content">' + (content || '') + '</div>' +
-        '<button class="window-close">حسناً</button>';
-    
-    win.querySelector('.window-close').onclick = () => win.remove();
-    document.body.appendChild(win);
-    
-    setTimeout(() => win.remove(), 5000);
-}
-
-function rebuildHotspots() {
-    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-    hotspotMarkers = {};
-    
-    const currentScene = scenes[currentSceneIndex];
-    if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
-    
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    
-    currentScene.hotspots.forEach(h => {
-        const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-        const projected = pos.clone().project(camera);
         
-        const x = (projected.x * 0.5 + 0.5) * width;
-        const y = (-projected.y * 0.5 + 0.5) * height;
-        
-        const iconElement = createHotspotElement(x, y, h.type, h.data);
-        iconElement._worldPosition = pos.clone();
-        iconElement.dataset.id = h.id;
-        
-        document.body.appendChild(iconElement);
-        hotspotMarkers[h.id] = iconElement;
-    });
-}
-
-function updateHotspotsPosition() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-
-    Object.values(hotspotMarkers).forEach(el => {
-        if (!el._worldPosition) return;
-
-        const projected = el._worldPosition.clone().project(camera);
-
-        if (projected.z > 1) {
-            el.style.display = 'none';
-            return;
+        function showInfoWindow(title, content) {
+            document.querySelectorAll('.custom-info-window').forEach(el => el.remove());
+            
+            const win = document.createElement('div');
+            win.className = 'custom-info-window';
+            win.innerHTML = '<div class="window-header">' +
+                '<img src="' + ICONS.info + '">' +
+                '<h3>' + (title || 'معلومات') + '</h3>' +
+                '</div>' +
+                '<div class="window-content">' + (content || '') + '</div>' +
+                '<button class="window-close">حسناً</button>';
+            
+            win.querySelector('.window-close').onclick = () => win.remove();
+            document.body.appendChild(win);
+            
+            setTimeout(() => win.remove(), 5000);
         }
 
-        const x = (projected.x * 0.5 + 0.5) * width;
-        const y = (-projected.y * 0.5 + 0.5) * height;
-
-        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
-            el.style.display = 'none';
-            return;
+        function rebuildHotspots() {
+            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+            hotspotMarkers = {};
+            
+            const currentScene = scenes[currentSceneIndex];
+            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
+            
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            currentScene.hotspots.forEach(h => {
+                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+                const projected = pos.clone().project(camera);
+                
+                const x = (projected.x * 0.5 + 0.5) * width;
+                const y = (-projected.y * 0.5 + 0.5) * height;
+                
+                const iconElement = createHotspotElement(x, y, h.type, h.data);
+                iconElement._worldPosition = pos.clone();
+                iconElement.dataset.id = h.id;
+                
+                document.body.appendChild(iconElement);
+                hotspotMarkers[h.id] = iconElement;
+            });
         }
 
-        el.style.display = 'block';
-        el.style.left = x + 'px';
-        el.style.top = y + 'px';
-    });
-}
-        
+        function updateHotspotsPosition() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
 
-               // ===== دوال المسارات =====
+            Object.values(hotspotMarkers).forEach(el => {
+                if (!el._worldPosition) return;
+
+                const projected = el._worldPosition.clone().project(camera);
+
+                if (projected.z > 1) {
+                    el.style.display = 'none';
+                    return;
+                }
+
+                const x = (projected.x * 0.5 + 0.5) * width;
+                const y = (-projected.y * 0.5 + 0.5) * height;
+
+                if (x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+                    el.style.display = 'none';
+                    return;
+                }
+
+                el.style.display = 'block';
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            });
+        }
+
+              // ===== دوال المسارات =====
         function togglePathsByType(type, visible) {
             allPaths.forEach(p => { if (p.userData && p.userData.type === type) p.visible = visible; });
         }
