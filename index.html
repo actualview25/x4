@@ -453,7 +453,6 @@ function createHotspotElement(x, y, type, data) {
             setTimeout(() => win.remove(), 5000);
         }
 function rebuildHotspots() {
-    // إزالة النقاط القديمة
     document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
     hotspotMarkers = {};
     
@@ -464,21 +463,27 @@ function rebuildHotspots() {
     const height = window.innerHeight;
     
     currentScene.hotspots.forEach(h => {
+        // 👇 حماية نوع النقطة (ذكية)
+        let type = (typeof h.type === 'string') ? h.type.toUpperCase() : 'INFO';
+        
         const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
         const projected = pos.clone().project(camera);
         
-        // ✅ النقاط خلف الكاميرا لا تظهر
-        if (projected.z > 1) return;
+        // 👇 نخفي فقط ولا نمنع الإنشاء
+        const hiddenByZ = projected.z > 1;
         
         const x = (projected.x * 0.5 + 0.5) * width;
         const y = (-projected.y * 0.5 + 0.5) * height;
         
-        // ✅ خارج حدود الشاشة لا تظهر
-        if (x < -100 || x > width + 100 || y < -100 || y > height + 100) return;
-        
-        const iconElement = createHotspotElement(x, y, h.type, h.data);
+        // 👇 ننشئ دائماً
+        const iconElement = createHotspotElement(x, y, type, h.data || {});
         iconElement._worldPosition = pos.clone();
         iconElement.dataset.id = h.id;
+        
+        // 👇 نخفي إذا كان خارج الرؤية
+        if (hiddenByZ || x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+            iconElement.style.display = 'none';
+        }
         
         document.body.appendChild(iconElement);
         hotspotMarkers[h.id] = iconElement;
