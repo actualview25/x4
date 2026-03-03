@@ -395,37 +395,44 @@
             });
         }
 // ===== دوال Hotspots =====
-function createHotspotElement(type, data) {
-    // التأكد من أن type نصي
-    if (!type || typeof type !== 'string') {
-        console.warn('⚠️ نوع الهوتسبوت غير صحيح:', type, data);
-        type = 'INFO'; // تعيين نوع افتراضي لتجنب الأخطاء
-    }
-
-    const upperType = type.toUpperCase();
-
-    const el = document.createElement('div');
-    el.className = 'hotspot-element';
-    el.dataset.type = upperType;
-
-    if (upperType === 'INFO') {
-        el.innerHTML = `<span class="hotspot-icon">🛈</span>`;
-        el.title = data?.title || 'معلومة';
-    } else if (upperType === 'SCENE') {
-        el.innerHTML = `<span class="hotspot-icon">🚪</span>`;
-        el.title = data?.description || data?.targetSceneName || 'انتقال لمشهد';
-    } else {
-        // نوع غير معروف
-        el.innerHTML = `<span class="hotspot-icon">❓</span>`;
-        el.title = data?.title || 'هوتسبوت غير معروف';
-        console.warn('⚠️ تم إنشاء هوتسبوت بنوع غير معروف:', type);
-    }
-
-    // إضافة بيانات إضافية
-    el.dataset.id = data?.id || '';
-    el.dataset.info = JSON.stringify(data || {});
-
-    return el;
+// ===== دوال Hotspots =====
+function createHotspotElement(x, y, type, data) {
+    const div = document.createElement('div');
+    div.className = 'hotspot-marker';
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+    div.style.cursor = 'pointer';
+    div.style.zIndex = '1000';
+    div.style.pointerEvents = 'auto'; // 👈 1. الحاوية تستقبل النقر
+    
+    const iconUrl = type === 'SCENE' ? ICONS.hotspot : ICONS.info;
+    const borderColor = type === 'SCENE' ? '#44aaff' : '#ffaa44';
+    const displayText = type === 'SCENE' 
+        ? (data.targetSceneName || 'انتقال') 
+        : (data.title || 'معلومات');
+    
+    // 👈 2. أضف pointer-events: none للعناصر الداخلية
+    div.innerHTML = '<img src="' + iconUrl + '" alt="' + type + '" ' +
+        'style="border: 2px solid ' + borderColor + '; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); pointer-events: none;">' +
+        '<div class="hotspot-label" style="border-color: ' + borderColor + '; pointer-events: none;">' + 
+        displayText + 
+        '</div>';
+    
+    div.addEventListener('click', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (type === 'INFO') {
+            showInfoWindow(data.title, data.content);
+        } else {
+            const targetIndex = scenes.findIndex(s => s.id === data.targetSceneId);
+            if (targetIndex !== -1) {
+                setTimeout(() => loadScene(targetIndex), 300);
+            }
+        }
+    });
+    
+    return div;
 }
         
         function showInfoWindow(title, content) {
@@ -445,33 +452,40 @@ function createHotspotElement(type, data) {
             
             setTimeout(() => win.remove(), 5000);
         }
-
-        function rebuildHotspots() {
-            document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
-            hotspotMarkers = {};
-            
-            const currentScene = scenes[currentSceneIndex];
-            if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
-            
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            currentScene.hotspots.forEach(h => {
-                const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
-                const projected = pos.clone().project(camera);
-                
-                const x = (projected.x * 0.5 + 0.5) * width;
-                const y = (-projected.y * 0.5 + 0.5) * height;
-                
-                const iconElement = createHotspotElement(x, y, h.type, h.data);
-                iconElement._worldPosition = pos.clone();
-                iconElement.dataset.id = h.id;
-                
-                document.body.appendChild(iconElement);
-                hotspotMarkers[h.id] = iconElement;
-            });
+function rebuildHotspots() {
+    document.querySelectorAll('.hotspot-marker').forEach(el => el.remove());
+    hotspotMarkers = {};
+    
+    const currentScene = scenes[currentSceneIndex];
+    if (!currentScene || !currentScene.hotspots || !currentScene.hotspots.length) return;
+    
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    currentScene.hotspots.forEach(h => {
+        const pos = new THREE.Vector3(h.position.x, h.position.y, h.position.z);
+        const projected = pos.clone().project(camera); // 👈 استخدم clone
+        
+        // ✅ لا نمنع الإنشاء، نخفي فقط
+        const hiddenByZ = projected.z > 1;
+        
+        const x = (projected.x * 0.5 + 0.5) * width;
+        const y = (-projected.y * 0.5 + 0.5) * height;
+        
+        // ✅ ننشئ الهوتسبوت دائمًا
+        const iconElement = createHotspotElement(x, y, h.type, h.data);
+        iconElement._worldPosition = pos.clone(); // 👈 استخدم pos الأصلي
+        iconElement.dataset.id = h.id;
+        
+        // ✅ نخفيه فقط إن كان خارج الرؤية
+        if (hiddenByZ || x < -100 || x > width + 100 || y < -100 || y > height + 100) {
+            iconElement.style.display = 'none';
         }
-
+        
+        document.body.appendChild(iconElement);
+        hotspotMarkers[h.id] = iconElement;
+    });
+}
         function updateHotspotsPosition() {
             const width = window.innerWidth;
             const height = window.innerHeight;
