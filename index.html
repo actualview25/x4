@@ -229,11 +229,33 @@
             max-height: calc(70vh - 60px); 
             overflow-y: auto; 
             padding: 8px;
-        }
-        .scene-list-container::-webkit-scrollbar { width: 4px; }
-        .scene-list-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-        .scene-list-container::-webkit-scrollbar-thumb { background: rgba(74, 108, 143, 0.4); border-radius: 4px; }
-        
+        }.scene-list-container {
+    max-height: 300px; /* ارتفاع ثابت يناسب 4-5 مشاهد */
+    overflow-y: auto; /* هذا السطر يضيف السكرول */
+    overflow-x: hidden;
+    padding: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(74, 108, 143, 0.4) rgba(0,0,0,0.2);
+}
+
+/* تحسين شكل شريط التمرير */
+.scene-list-container::-webkit-scrollbar {
+    width: 4px;
+}
+
+.scene-list-container::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.scene-list-container::-webkit-scrollbar-thumb {
+    background: rgba(74, 108, 143, 0.4);
+    border-radius: 4px;
+}
+
+.scene-list-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 108, 143, 0.7);
+}
         .scene-item {
             padding: 8px 10px;
             margin: 4px 0;
