@@ -167,14 +167,14 @@
             display: inline-block; 
         }
         
-       /* ===== لوحة المشاهد - مع سكرول ثابت ===== */
+/* ===== لوحة المشاهد - نفس الحجم السابق مع سكرول ===== */
 .scene-list-panel {
     position: fixed; 
     top: 50%; 
     left: 20px; 
     transform: translateY(-50%);
     width: 260px; 
-    height: 400px; /* ارتفاع ثابت بدلاً من max-height */
+    max-height: 70vh; /* نفس الحجم السابق */
     background: rgba(20, 30, 40, 0.25);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(74, 108, 143, 0.3);
@@ -185,6 +185,18 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: all 0.3s ease; /* مهم لزر الإخفاء */
+}
+
+/* حالة الإخفاء - نفس الحجم السابق */
+.scene-list-panel.collapsed {
+    width: 50px;
+    overflow: hidden;
+}
+
+.scene-list-panel.collapsed .panel-header h3 span:last-child,
+.scene-list-panel.collapsed .scene-list-container {
+    display: none;
 }
 
 .panel-header {
@@ -195,41 +207,69 @@
     align-items: center;
     background: rgba(0,0,0,0.2);
     flex-shrink: 0;
-    height: 50px; /* ارتفاع ثابت للرأس */
-    box-sizing: border-box;
+    cursor: pointer; /* مؤشر يد للزر */
 }
 
+.panel-header h3 { 
+    margin: 0; 
+    color: white; 
+    font-size: 14px; 
+    font-weight: 500; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.panel-toggle {
+    background: none; 
+    border: none; 
+    color: rgba(255,255,255,0.7); 
+    font-size: 16px; 
+    cursor: pointer;
+    width: 28px; 
+    height: 28px; 
+    border-radius: 50%; 
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.panel-toggle:hover { 
+    background: rgba(255,255,255,0.1); 
+    color: white; 
+}
+
+/* قائمة المشاهد - مع سكرول */
 .scene-list-container {
-    flex: 1; /* يأخذ المساحة المتبقية */
-    overflow-y: auto !important; /* السكرول إجباري */
+    max-height: calc(70vh - 60px); /* نفس الحساب السابق */
+    overflow-y: auto !important;
     overflow-x: hidden;
     padding: 8px;
-    min-height: 0; /* مهم جداً للسكرول */
-    height: calc(400px - 50px - 2px); /* حساب دقيق: ارتفاع اللوحة - ارتفاع الرأس - الحدود */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(74, 108, 143, 0.4) rgba(0,0,0,0.2);
 }
 
-/* شريط التمرير - دائماً مرئي */
+/* تحسين شريط التمرير - نحيف جداً */
 .scene-list-container::-webkit-scrollbar {
-    width: 6px;
-    background: transparent;
+    width: 4px;
 }
 
 .scene-list-container::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.2);
-    border-radius: 6px;
+    background: transparent;
 }
 
 .scene-list-container::-webkit-scrollbar-thumb {
-    background: rgba(74, 108, 143, 0.5);
-    border-radius: 6px;
-    min-height: 40px;
+    background: rgba(74, 108, 143, 0.3);
+    border-radius: 4px;
 }
 
 .scene-list-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(74, 108, 143, 0.8);
+    background: rgba(74, 108, 143, 0.6);
 }
 
-/* عناصر المشاهد */
+/* عناصر المشاهد - نفس الحجم */
 .scene-item {
     padding: 10px 12px;
     margin: 4px 0;
@@ -242,8 +282,6 @@
     transition: all 0.2s ease;
     border: 1px solid transparent;
     font-size: 13px;
-    height: 45px; /* ارتفاع ثابت لكل مشهد */
-    box-sizing: border-box;
 }
         
         /* ===== أنماط Hotspots ===== */
